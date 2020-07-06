@@ -3,16 +3,6 @@ package com.sys.model;
 import java.math.BigDecimal;
 import java.util.Date;
 
-/**
- *
- * @Since 2010-2019
- * @Description: TODO
- * @author ***
- * @date 2019-05-15 13:51:48
- *
- */
-//@Entity
-//@Table(name = "SYS_USER")
 public class SysUser {
 	
 	//alias

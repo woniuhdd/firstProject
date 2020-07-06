@@ -8,7 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SysUserManagerImpl extends GenericManagerImpl<SysUser, String> implements SysUserManager  {
+public class SysUserManagerImpl extends GenericManagerImpl<SysUser,String> implements SysUserManager  {
 	// 扩展接口实现
     @Autowired
     private SysUserDao dao;

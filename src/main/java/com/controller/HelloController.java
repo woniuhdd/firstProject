@@ -23,10 +23,10 @@ public class HelloController {
 
     @RequestMapping(value = "/sayHello", method = {RequestMethod.POST})
     @ResponseBody
-    public String sayHello() {
+    public SysUser sayHello() {
         SysUser sysUser = sysUserManager.getById("ZBZX");
-//        return sysUser;
-        return "returnJsonObj";
+        return sysUser;
+//        return "returnJsonObj";
     }
 
 

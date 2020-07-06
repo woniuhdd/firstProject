@@ -3,14 +3,6 @@ package com.common.model;
 import java.io.Serializable;
 import java.util.Date;
 
-/**
- *
- * @Since 2010-2016
- * @Description: 
- * @author ***
- * @date 2016-06-15 17:40:42
- *
- */
 public class SysDatainterfaceLastRequest implements Serializable{
 	
 	/**

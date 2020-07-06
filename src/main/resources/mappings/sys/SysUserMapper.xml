@@ -125,6 +125,29 @@
         </if>
     </sql>
 
+    <select id="getById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="full-columns" />
+        FROM SYS_USER t
+        WHERE t.USERID = #{value}
+    </select>
+
+    <select id="countByParams" parameterType="map" resultType="int">
+        SELECT count(*)
+        FROM SYS_USER t
+        <where>
+            <include refid="common_where_if"/>
+        </where>
+    </select>
+
+    <select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="full-columns" />
+        FROM SYS_USER t
+        <where>
+            <include refid="common_where_if"/>
+        </where>
+    </select>
+
     <insert id="save" parameterType="com.sys.model.SysUser">
         INSERT INTO SYS_USER(
             USERID ,
@@ -233,37 +256,6 @@
             )
         </foreach>
     </insert>
-
-    <select id="getById" parameterType="java.lang.String" resultMap="BaseResultMap">
-        SELECT <include refid="full-columns" />
-        FROM SYS_USER t
-        WHERE t.USERID = #{value}
-    </select>
-
-    <select id="getUserByUsername" parameterType="java.lang.String"
-            resultMap="BaseResultMap">
-        SELECT
-        <include refid="full-columns" />
-        FROM SYS_USER t
-        WHERE t.USERID = #{value}
-    </select>
-
-    <select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
-        SELECT
-        <include refid="full-columns" />
-        FROM SYS_USER t
-        <where>
-            <include refid="common_where_if"/>
-        </where>
-    </select>
-
-    <select id="countByParams" parameterType="map" resultType="int">
-        SELECT count(*)
-        FROM SYS_USER t
-        <where>
-            <include refid="common_where_if"/>
-        </where>
-    </select>
 
     <update id="updateById" parameterType="com.sys.model.SysUser">
         UPDATE SYS_USER
@@ -417,5 +409,13 @@
         DELETE FROM
             SYS_USER WHERE USERID = #{value}
     </delete>
+
+    <select id="getUserByUsername" parameterType="java.lang.String"
+            resultMap="BaseResultMap">
+        SELECT
+        <include refid="full-columns" />
+        FROM SYS_USER t
+        WHERE t.USERID = #{value}
+    </select>
 
 </mapper>
