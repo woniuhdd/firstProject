@@ -1,7 +1,5 @@
 package com.sys.model;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
 import java.math.BigDecimal;
 import java.util.Date;
 
@@ -13,8 +11,8 @@ import java.util.Date;
  * @date 2019-05-15 13:51:48
  *
  */
-@Entity
-@Table(name = "SYS_USER")
+//@Entity
+//@Table(name = "SYS_USER")
 public class SysUser {
 	
 	//alias

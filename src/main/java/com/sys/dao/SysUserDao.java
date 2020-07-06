@@ -2,6 +2,7 @@ package com.sys.dao;
 
 import com.common.dao.GenericDao;
 import com.sys.model.SysUser;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
@@ -12,6 +13,7 @@ import java.util.Map;
  * @author baohaitao
  * @date
  */
+@Mapper
 public interface SysUserDao extends GenericDao<SysUser, Integer> {
 
     /**

@@ -1,0 +1,421 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sys.dao.SysUserDao">
+    <resultMap type="com.sys.model.SysUser" id="BaseResultMap">
+        <result property="userid" column="USERID" javaType="String" />
+        <result property="username" column="USERNAME" javaType="String" />
+        <result property="userpwd" column="USERPWD" javaType="String" />
+        <result property="userstatus" column="USERSTATUS" javaType="String" />
+        <result property="loginlasttime" column="LOGINLASTTIME" javaType="Date" />
+        <result property="isadmin" column="ISADMIN" javaType="String" />
+        <result property="extime" column="EXTIME" javaType="Date" />
+        <result property="orgid" column="ORGID" javaType="String" />
+        <result property="certid" column="CERTID" javaType="String" />
+        <result property="mustca" column="MUSTCA" javaType="String" />
+        <result property="iscompany" column="ISCOMPANY" javaType="String" />
+        <result property="departname" column="DEPARTNAME" javaType="String" />
+        <result property="contactperson" column="CONTACTPERSON" javaType="String" />
+        <result property="contacttel" column="CONTACTTEL" javaType="String" />
+        <result property="id" column="ID" javaType="String" />
+        <result property="certsign" column="CERTSIGN" javaType="String" />
+        <result property="usertype" column="USERTYPE" javaType="BigDecimal" />
+        <result property="adminuserid" column="ADMINUSERID" javaType="String" />
+        <result property="updateusername" column="UPDATEUSERNAME" javaType="String" />
+        <result property="updateuserposition" column="UPDATEUSERPOSITION" javaType="String" />
+        <result property="updateuserdepartment" column="UPDATEUSERDEPARTMENT" javaType="String" />
+        <result property="updateuserphone" column="UPDATEUSERPHONE" javaType="String" />
+        <result property="updateusertel" column="UPDATEUSERTEL" javaType="String" />
+    </resultMap>
+
+    <sql id="full-columns">
+        t.USERID,
+		t.USERNAME,
+		t.USERPWD,
+		t.USERSTATUS,
+		t.LOGINLASTTIME,
+		t.ISADMIN,
+		t.EXTIME,
+		t.ORGID,
+		t.CERTID,
+		t.MUSTCA,
+		t.ISCOMPANY,
+		t.DEPARTNAME,
+		t.CONTACTPERSON,
+		t.CONTACTTEL,
+		t.ID,
+		t.CERTSIGN,
+		t.USERTYPE,
+		t.ADMINUSERID,
+		t.UPDATEUSERNAME,
+		t.UPDATEUSERPOSITION,
+		t.UPDATEUSERDEPARTMENT,
+		t.UPDATEUSERPHONE,
+		t.UPDATEUSERTEL
+    </sql>
+
+    <sql id="common_where_if">
+        <if test="@OGNL@isNotEmpty(userid)">
+            AND t.USERID = #{userid}
+        </if>
+        <if test="@OGNL@isNotEmpty(username)">
+            AND t.USERNAME = #{username}
+        </if>
+        <if test="@OGNL@isNotEmpty(userpwd)">
+            AND t.USERPWD = #{userpwd}
+        </if>
+        <if test="@OGNL@isNotEmpty(userstatus)">
+            AND t.USERSTATUS = #{userstatus}
+        </if>
+        <if test="@OGNL@isNotEmpty(loginlasttime)">
+            AND t.LOGINLASTTIME = #{loginlasttime}
+        </if>
+        <if test="@OGNL@isNotEmpty(isadmin)">
+            AND t.ISADMIN = #{isadmin}
+        </if>
+        <if test="@OGNL@isNotEmpty(extime)">
+            AND t.EXTIME = #{extime}
+        </if>
+        <if test="@OGNL@isNotEmpty(orgid)">
+            AND t.ORGID = #{orgid}
+        </if>
+        <if test="@OGNL@isNotEmpty(certid)">
+            AND t.CERTID = #{certid}
+        </if>
+        <if test="@OGNL@isNotEmpty(mustca)">
+            AND t.MUSTCA = #{mustca}
+        </if>
+        <if test="@OGNL@isNotEmpty(iscompany)">
+            AND t.ISCOMPANY = #{iscompany}
+        </if>
+        <if test="@OGNL@isNotEmpty(departname)">
+            AND t.DEPARTNAME = #{departname}
+        </if>
+        <if test="@OGNL@isNotEmpty(contactperson)">
+            AND t.CONTACTPERSON = #{contactperson}
+        </if>
+        <if test="@OGNL@isNotEmpty(contacttel)">
+            AND t.CONTACTTEL = #{contacttel}
+        </if>
+        <if test="@OGNL@isNotEmpty(id)">
+            AND t.ID = #{id}
+        </if>
+        <if test="@OGNL@isNotEmpty(certsign)">
+            AND t.CERTSIGN = #{certsign}
+        </if>
+        <if test="@OGNL@isNotEmpty(usertype)">
+            AND t.USERTYPE = #{usertype}
+        </if>
+        <if test="@OGNL@isNotEmpty(adminuserid)">
+            AND t.ADMINUSERID = #{adminuserid}
+        </if>
+        <if test="@OGNL@isNotEmpty(updateusername)">
+            AND t.UPDATEUSERNAME = #{updateusername}
+        </if>
+        <if test="@OGNL@isNotEmpty(updateuserposition)">
+            AND t.UPDATEUSERPOSITION = #{updateuserposition}
+        </if>
+        <if test="@OGNL@isNotEmpty(updateuserdepartment)">
+            AND t.UPDATEUSERDEPARTMENT = #{updateuserdepartment}
+        </if>
+        <if test="@OGNL@isNotEmpty(updateuserphone)">
+            AND t.UPDATEUSERPHONE = #{updateuserphone}
+        </if>
+        <if test="@OGNL@isNotEmpty(updateusertel)">
+            AND t.UPDATEUSERTEL = #{updateusertel}
+        </if>
+    </sql>
+
+    <insert id="save" parameterType="com.sys.model.SysUser">
+        INSERT INTO SYS_USER(
+            USERID ,
+            USERNAME ,
+            USERPWD ,
+            USERSTATUS ,
+            LOGINLASTTIME ,
+            ISADMIN ,
+            EXTIME ,
+            ORGID ,
+            CERTID ,
+            MUSTCA ,
+            ISCOMPANY ,
+            DEPARTNAME ,
+            CONTACTPERSON ,
+            CONTACTTEL ,
+            ID ,
+            CERTSIGN ,
+            USERTYPE ,
+            ADMINUSERID ,
+            UPDATEUSERNAME ,
+            UPDATEUSERPOSITION ,
+            UPDATEUSERDEPARTMENT ,
+            UPDATEUSERPHONE ,
+            UPDATEUSERTEL
+        )
+        VALUES (
+                   #{userid} ,
+                   #{username} ,
+                   #{userpwd} ,
+                   #{userstatus} ,
+                   #{loginlasttime} ,
+                   #{isadmin} ,
+                   #{extime} ,
+                   #{orgid} ,
+                   #{certid} ,
+                   #{mustca} ,
+                   #{iscompany} ,
+                   #{departname} ,
+                   #{contactperson} ,
+                   #{contacttel} ,
+                   #{id} ,
+                   #{certsign} ,
+                   #{usertype} ,
+                   #{adminuserid} ,
+                   #{updateusername} ,
+                   #{updateuserposition} ,
+                   #{updateuserdepartment} ,
+                   #{updateuserphone} ,
+                   #{updateusertel}
+               )
+    </insert>
+
+    <insert id="saveBatch" parameterType="java.util.List">
+        INSERT INTO SYS_USER (
+        USERID ,
+        USERNAME ,
+        USERPWD ,
+        USERSTATUS ,
+        LOGINLASTTIME ,
+        ISADMIN ,
+        EXTIME ,
+        ORGID ,
+        CERTID ,
+        MUSTCA ,
+        ISCOMPANY ,
+        DEPARTNAME ,
+        CONTACTPERSON ,
+        CONTACTTEL ,
+        ID ,
+        CERTSIGN ,
+        USERTYPE ,
+        ADMINUSERID ,
+        UPDATEUSERNAME ,
+        UPDATEUSERPOSITION ,
+        UPDATEUSERDEPARTMENT ,
+        UPDATEUSERPHONE ,
+        UPDATEUSERTEL
+        ) VALUES
+        <foreach collection="list" item="item" index="index"
+                 separator=",">
+            (
+            #{item.userid},
+            #{item.username},
+            #{item.userpwd},
+            #{item.userstatus},
+            #{item.loginlasttime},
+            #{item.isadmin},
+            #{item.extime},
+            #{item.orgid},
+            #{item.certid},
+            #{item.mustca},
+            #{item.iscompany},
+            #{item.departname},
+            #{item.contactperson},
+            #{item.contacttel},
+            #{item.id},
+            #{item.certsign},
+            #{item.usertype},
+            #{item.adminuserid},
+            #{item.updateusername},
+            #{item.updateuserposition},
+            #{item.updateuserdepartment},
+            #{item.updateuserphone},
+            #{item.updateusertel}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getById" parameterType="java.lang.String" resultMap="BaseResultMap">
+        SELECT <include refid="full-columns" />
+        FROM SYS_USER t
+        WHERE t.USERID = #{value}
+    </select>
+
+    <select id="getUserByUsername" parameterType="java.lang.String"
+            resultMap="BaseResultMap">
+        SELECT
+        <include refid="full-columns" />
+        FROM SYS_USER t
+        WHERE t.USERID = #{value}
+    </select>
+
+    <select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+        SELECT
+        <include refid="full-columns" />
+        FROM SYS_USER t
+        <where>
+            <include refid="common_where_if"/>
+        </where>
+    </select>
+
+    <select id="countByParams" parameterType="map" resultType="int">
+        SELECT count(*)
+        FROM SYS_USER t
+        <where>
+            <include refid="common_where_if"/>
+        </where>
+    </select>
+
+    <update id="updateById" parameterType="com.sys.model.SysUser">
+        UPDATE SYS_USER
+        <set>
+            USERNAME =
+            #{username},
+            USERPWD =
+            #{userpwd},
+            USERSTATUS =
+            #{userstatus},
+            LOGINLASTTIME =
+            #{loginlasttime},
+            ISADMIN =
+            #{isadmin},
+            EXTIME =
+            #{extime},
+            ORGID =
+            #{orgid},
+            CERTID =
+            #{certid},
+            MUSTCA =
+            #{mustca},
+            ISCOMPANY =
+            #{iscompany},
+            DEPARTNAME =
+            #{departname},
+            CONTACTPERSON =
+            #{contactperson},
+            CONTACTTEL =
+            #{contacttel},
+            ID =
+            #{id},
+            CERTSIGN =
+            #{certsign},
+            USERTYPE =
+            #{usertype},
+            ADMINUSERID =
+            #{adminuserid},
+            UPDATEUSERNAME =
+            #{updateusername},
+            UPDATEUSERPOSITION =
+            #{updateuserposition},
+            UPDATEUSERDEPARTMENT =
+            #{updateuserdepartment},
+            UPDATEUSERPHONE =
+            #{updateuserphone},
+            UPDATEUSERTEL =
+            #{updateusertel},
+        </set>
+        WHERE USERID =
+        #{userid}
+    </update>
+
+    <update id="updateBySelective" parameterType="com.sys.model.SysUser">
+        UPDATE SYS_USER
+        <set>
+            <if test="@OGNL@isNotEmpty(username)">
+                USERNAME =
+                #{username},
+            </if>
+            <if test="@OGNL@isNotEmpty(userpwd)">
+                USERPWD =
+                #{userpwd},
+            </if>
+            <if test="@OGNL@isNotEmpty(userstatus)">
+                USERSTATUS =
+                #{userstatus},
+            </if>
+            <if test="@OGNL@isNotEmpty(loginlasttime)">
+                LOGINLASTTIME =
+                #{loginlasttime},
+            </if>
+            <if test="@OGNL@isNotEmpty(isadmin)">
+                ISADMIN =
+                #{isadmin},
+            </if>
+            <if test="@OGNL@isNotEmpty(extime)">
+                EXTIME =
+                #{extime},
+            </if>
+            <if test="@OGNL@isNotEmpty(orgid)">
+                ORGID =
+                #{orgid},
+            </if>
+            <if test="@OGNL@isNotEmpty(certid)">
+                CERTID =
+                #{certid},
+            </if>
+            <if test="@OGNL@isNotEmpty(mustca)">
+                MUSTCA =
+                #{mustca},
+            </if>
+            <if test="@OGNL@isNotEmpty(iscompany)">
+                ISCOMPANY =
+                #{iscompany},
+            </if>
+            <if test="@OGNL@isNotEmpty(departname)">
+                DEPARTNAME =
+                #{departname},
+            </if>
+            <if test="@OGNL@isNotEmpty(contactperson)">
+                CONTACTPERSON =
+                #{contactperson},
+            </if>
+            <if test="@OGNL@isNotEmpty(contacttel)">
+                CONTACTTEL =
+                #{contacttel},
+            </if>
+            <if test="@OGNL@isNotEmpty(id)">
+                ID =
+                #{id},
+            </if>
+            <if test="@OGNL@isNotEmpty(certsign)">
+                CERTSIGN =
+                #{certsign},
+            </if>
+            <if test="@OGNL@isNotEmpty(usertype)">
+                USERTYPE =
+                #{usertype},
+            </if>
+            <if test="@OGNL@isNotEmpty(adminuserid)">
+                ADMINUSERID =
+                #{adminuserid},
+            </if>
+            <if test="@OGNL@isNotEmpty(updateusername)">
+                UPDATEUSERNAME =
+                #{updateusername},
+            </if>
+            <if test="@OGNL@isNotEmpty(updateuserposition)">
+                UPDATEUSERPOSITION =
+                #{updateuserposition},
+            </if>
+            <if test="@OGNL@isNotEmpty(updateuserdepartment)">
+                UPDATEUSERDEPARTMENT =
+                #{updateuserdepartment},
+            </if>
+            <if test="@OGNL@isNotEmpty(updateuserphone)">
+                UPDATEUSERPHONE =
+                #{updateuserphone},
+            </if>
+            <if test="@OGNL@isNotEmpty(updateusertel)">
+                UPDATEUSERTEL =
+                #{updateusertel},
+            </if>
+        </set>
+        WHERE USERID =
+        #{userid}
+    </update>
+
+    <delete id="deleteById" parameterType="java.lang.String">
+        DELETE FROM
+            SYS_USER WHERE USERID = #{value}
+    </delete>
+
+</mapper>

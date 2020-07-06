@@ -5,7 +5,6 @@ import com.sys.dao.SysUserDao;
 import com.sys.model.SysUser;
 import com.sys.service.SysUserManager;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 
 @Service
