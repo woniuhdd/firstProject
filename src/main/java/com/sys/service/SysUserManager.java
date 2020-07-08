@@ -14,4 +14,5 @@ public interface SysUserManager extends GenericManager<SysUser, String> {
      */
     SysUser getUserByUsername(String username);
 
+    Pagination getData(Pagination page);
 }

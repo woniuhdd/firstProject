@@ -2,10 +2,12 @@ package com.common.service;
 
 import com.common.model.SysDatainterfaceLastRequest;
 import com.common.model.SysDatainterfaceOrganization;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
 
+@Service
 public interface SysDatainterfaceOrganizationManager extends GenericManager<SysDatainterfaceOrganization, Integer> {
 	// 扩展接口
 
@@ -30,7 +32,6 @@ public interface SysDatainterfaceOrganizationManager extends GenericManager<SysD
 	int updateBySelective(SysDatainterfaceOrganization sdo, List<SysDatainterfaceLastRequest> reList);
 
 
-	
-	List<String> getData(Map<String, Object> params);
+		List<String> getData(Map<String, Object> params);
 
 }

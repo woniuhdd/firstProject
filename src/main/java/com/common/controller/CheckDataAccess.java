@@ -4,7 +4,6 @@
 //import com.common.model.SysDatainterfaceOrganization;
 //import com.common.service.SysDatainterfaceOrganizationManager;
 //import com.common.utils.Pagination;
-//import com.controller.ComTokenController;
 //import com.enums.ErrorCodeCompany;
 //import com.enums.ReturnCode;
 //import com.enums.Status;
@@ -46,6 +45,7 @@
 //        map.put("orgUserName", orgUserName);
 //        JSONObject returnJsonObj = new JSONObject();
 //
+//        //验证参数是否为空
 //        if (StringUtils.isEmpty(orgUserName) || StringUtils.isEmpty(params)) {
 //            returnJsonObj.put("returnCode", ReturnCode.PARAMETERS_FORMAT_ERROR.getKey());
 //            returnJsonObj.put("returnMsg", ReturnCode.PARAMETERS_FORMAT_ERROR.getValue());
