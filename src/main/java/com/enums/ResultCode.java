@@ -14,7 +14,7 @@ package com.enums;
 public enum ResultCode {
 
     /* 成功状态码 */
-    SUCCESS(0,"操作成功！"),
+    SUCCESS(1,"操作成功！"),
 
     /* 错误状态码 */
     FAIL(-1,"操作失败！"),
@@ -82,7 +82,8 @@ public enum ResultCode {
     PERMISSION_TOKEN_EXPIRED(70004, "token已过期"),
     PERMISSION_LIMIT(70005, "访问次数受限制"),
     PERMISSION_TOKEN_INVALID(70006, "无效token"),
-    PERMISSION_SIGNATURE_ERROR(70007, "签名失败");
+    PERMISSION_SIGNATURE_ERROR(70007, "签名失败"),
+    PERMISSION_SIGNATURE_NOVALID(70008, "token未生效");
 
     //操作代码
     int code;
@@ -93,11 +94,11 @@ public enum ResultCode {
         this.message = message;
     }
 
-    public int code() {
+    public int getCode() {
         return code;
     }
 
-    public String message() {
+    public String getMessage() {
         return message;
     }
 

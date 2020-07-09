@@ -1,18 +1,27 @@
 package com.common.utils;
 
 import com.common.exception.CustomException;
-import com.common.model.Audience;
 import com.enums.ResultCode;
 import io.jsonwebtoken.*;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import javax.crypto.spec.SecretKeySpec;
 import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 
+@Component
 public class JwtTokenUtil {
-    private static Logger log = Logger.getLogger(JwtTokenUtil.class);
+    private static Logger log = LoggerFactory.getLogger(JwtTokenUtil.class);
+
+    //密钥
+    private static final String base64Secret = "MDk4ZjZiY2Q0NjIxZDM3M2NhZGU0ZTgzMjYyN2I0ZjY=";
+
+    private static final String clientId = "098f6bcd4621d373cade4e832627b4f6";
+    private static final String name = "restapiuser";
+    private static final int expiresSecond = 86400000;
 
     public static final String AUTH_HEADER_KEY = "Authorization";
 
@@ -21,13 +30,13 @@ public class JwtTokenUtil {
     /**
      * 解析jwt
      * @param jsonWebToken
-     * @param base64Security
+     * @param base64Secret
      * @return
      */
-    public static Claims parseJWT(String jsonWebToken, String base64Security) {
+    public static Claims parseJWT(String jsonWebToken) {
         try {
             Claims claims = Jwts.parser()
-                    .setSigningKey(DatatypeConverter.parseBase64Binary(base64Security))
+                    .setSigningKey(DatatypeConverter.parseBase64Binary(base64Secret))
                     .parseClaimsJws(jsonWebToken).getBody();
             return claims;
         } catch (ExpiredJwtException eje) {
@@ -47,7 +56,7 @@ public class JwtTokenUtil {
      * @param audience
      * @return
      */
-    public static String createJWT(String userId, String username, String role, Audience audience) {
+    public static String createJWT(String username, String password) {
         try {
             // 使用HS256加密算法
             SignatureAlgorithm signatureAlgorithm = SignatureAlgorithm.HS256;
@@ -56,24 +65,23 @@ public class JwtTokenUtil {
             Date now = new Date(nowMillis);
 
             //生成签名密钥
-            byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(audience.getBase64Secret());
+            byte[] apiKeySecretBytes = DatatypeConverter.parseBase64Binary(base64Secret);
             Key signingKey = new SecretKeySpec(apiKeySecretBytes, signatureAlgorithm.getJcaName());
 
             //userId是重要信息，进行加密下
-            String encryId = Base64Util.encode(userId);
+            String encryId = Base64Util.encode(password);
 
             //添加构成JWT的参数
             JwtBuilder builder = Jwts.builder().setHeaderParam("typ", "JWT")
                     // 可以将基本不重要的对象信息放到claims
-                    .claim("role", role)
-                    .claim("userId", userId)
+                    .claim("password", encryId)
                     .setSubject(username)           // 代表这个JWT的主体，即它的所有人
-                    .setIssuer(audience.getClientId())              // 代表这个JWT的签发主体；
+                    .setIssuer(clientId)              // 代表这个JWT的签发主体；
                     .setIssuedAt(new Date())        // 是一个时间戳，代表这个JWT的签发时间；
-                    .setAudience(audience.getName())          // 代表这个JWT的接收对象；
+                    .setAudience(name)          // 代表这个JWT的接收对象；
                     .signWith(signatureAlgorithm, signingKey);
             //添加Token过期时间
-            int TTLMillis = audience.getExpiresSecond();
+            int TTLMillis = expiresSecond;
             if (TTLMillis >= 0) {
                 long expMillis = nowMillis + TTLMillis;
                 Date exp = new Date(expMillis);
@@ -92,31 +100,28 @@ public class JwtTokenUtil {
     /**
      * 从token中获取用户名
      * @param token
-     * @param base64Security
      * @return
      */
-    public static String getUsername(String token, String base64Security){
-        return parseJWT(token, base64Security).getSubject();
+    public static String getUsername(String token){
+        return parseJWT(token).getSubject();
     }
 
     /**
      * 从token中获取用户ID
      * @param token
-     * @param base64Security
      * @return
      */
-    public static String getUserId(String token, String base64Security){
-        String userId = parseJWT(token, base64Security).get("userId", String.class);
+    public static String getUserId(String token){
+        String userId = parseJWT(token).get("userId", String.class);
         return Base64Util.decode(userId);
     }
 
     /**
      * 是否已过期
      * @param token
-     * @param base64Security
      * @return
      */
-    public static boolean isExpiration(String token, String base64Security) {
-        return parseJWT(token, base64Security).getExpiration().before(new Date());
+    public static boolean isExpiration(String token) {
+        return parseJWT(token).getExpiration().before(new Date());
     }
 }

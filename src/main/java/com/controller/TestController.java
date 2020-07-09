@@ -21,8 +21,8 @@ public class TestController {
     @ResponseBody
     public JSONObject sayHello() {
         JSONObject returnJsonObj = new JSONObject();
-        returnJsonObj.put("returnCode", "1");
-        returnJsonObj.put("returnMsg", "业务执行成功");
+        returnJsonObj.put("resultCode", "1");
+        returnJsonObj.put("resultMsg", "业务执行成功");
         return returnJsonObj;
     }
 

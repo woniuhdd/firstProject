@@ -1,19 +1,24 @@
 package com.controller;
 
 import com.alibaba.fastjson.JSONObject;
-import com.common.annotation.JwtIgnore;
-import com.common.model.Audience;
+import com.common.controller.ValidateUser;
 import com.common.utils.JwtTokenUtil;
 import com.enums.Result;
+import com.enums.ResultCode;
+import com.validator.FormatDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletResponse;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -22,41 +27,35 @@ public class ComTokenController {
     protected static final String ACTION_PATH = "/compInterface";
     private static final Logger log = LoggerFactory.getLogger(ComTokenController.class);
 
-//    @Autowired
-//    private CheckDataAccess checkDataAccess;
     @Autowired
-    private Audience audience;
-
-//    @RequestMapping(value = "/accessToken/getToken", method = {RequestMethod.POST})
-//    @ResponseBody
-//    public JSONObject getToken(String orgUserName, String params) {
-//        return checkDataAccess.getToken(orgUserName, params,0);
-//    }
-//
-//    @RequestMapping(value = "/accessToken/test/getToken", method = {RequestMethod.POST})
-//    @ResponseBody
-//    public JSONObject getTestToken(String orgUserName, String params) {
-//        return checkDataAccess.getToken(orgUserName, params,1);
-//    }
+    private ValidateUser validateUser;
 
 
-
-    @PostMapping("/login")
-    @JwtIgnore
-    public Result adminLogin(HttpServletResponse response, String username, String password) {
+    @RequestMapping("/getToken")
+    @ResponseBody
+    public JSONObject adminLogin(HttpServletResponse response, String username, String password) {
         // 这里模拟测试, 默认登录成功，返回用户ID和角色信息
         String userId = UUID.randomUUID().toString();
-        String role = "admin";
+        JSONObject returnJsonObj = new JSONObject();
+        //验证用户名密码
+        Map<String, Object> map = validateUser.validateUser(username,password);
 
-        // 创建token
-        String token = JwtTokenUtil.createJWT(userId, username, role, audience);
-        log.info("### 登录成功, token={} ###", token);
-        // 将token放在响应头
-        response.setHeader(JwtTokenUtil.AUTH_HEADER_KEY, JwtTokenUtil.TOKEN_PREFIX + token);
-        // 将token响应给客户端
-        JSONObject result = new JSONObject();
-        result.put("token", token);
-        return Result.SUCCESS(result);
+        Integer resultCode = (Integer) map.get("resultCode");
+        if (resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            // 创建token
+            String token = JwtTokenUtil.createJWT(username, password);
+            SimpleDateFormat sf = new SimpleDateFormat("yyyy-MM-dd");
+            Calendar nowTime = Calendar.getInstance();
+            returnJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+            returnJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
+            returnJsonObj.put("accessToken", token);
+            returnJsonObj.put("expiresIn", sf.format(nowTime.getTime()));
+            returnJsonObj.put("currentTime", new FormatDate().toFullFormat(new Date()));
+        }else {
+            returnJsonObj.put("resultCode", map.get("resultCode"));
+            returnJsonObj.put("resultMsg", map.get("resultMsg"));
+        }
+        return returnJsonObj;
     }
 
     @GetMapping("/users")

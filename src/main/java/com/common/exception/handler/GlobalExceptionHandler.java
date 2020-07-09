@@ -31,7 +31,7 @@ public class GlobalExceptionHandler {
 	public Result handleException(CustomException e) {
         // 打印异常信息
         log.error("### 异常信息:{} ###", e.getMessage());
-        return new Result(e.getResultCode());
+        return new Result(e.getRresultCode());
 	}
 
     /**

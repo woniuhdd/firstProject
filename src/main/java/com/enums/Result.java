@@ -25,13 +25,13 @@ public class Result<T> {
     T data;
 
     public Result(ResultCode resultCode){
-        this.code = resultCode.code();
-        this.message = resultCode.message();
+        this.code = resultCode.getCode();
+        this.message = resultCode.getMessage();
     }
 
     public Result(ResultCode resultCode, T data){
-        this.code = resultCode.code();
-        this.message = resultCode.message();
+        this.code = resultCode.getCode();
+        this.message = resultCode.getMessage();
         this.data = data;
     }
 
