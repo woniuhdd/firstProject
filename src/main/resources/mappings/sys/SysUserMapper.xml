@@ -415,7 +415,12 @@
         SELECT
         <include refid="full-columns" />
         FROM SYS_USER t
-        WHERE t.USERID = #{value}
+        <where>
+            <if test="@OGNL@isNotEmpty(userId)">
+                WHERE t.USERID = #{userId}
+            </if>
+        </where>
+
     </select>
 
 </mapper>
