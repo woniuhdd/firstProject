@@ -1,4 +1,4 @@
-package com.common.model;
+package com.sys.model;
 
 import java.io.Serializable;
 import java.util.Date;

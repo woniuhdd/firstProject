@@ -2,16 +2,25 @@ package com.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.common.controller.ValidateToken;
+import com.common.utils.Pagination;
+import com.common.utils.ValidateUtil;
 import com.enums.ResultCode;
+import com.sys.service.SysDatainterfaceOrganizationManager;
+import com.trade.model.TradePurchaseorderdetail;
+import com.trade.service.TradePurchaseorderdetailManager;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @RestController(CompInterfaceController.ACTION_PATH)
 @RequestMapping(CompInterfaceController.ACTION_PATH)
@@ -21,6 +30,12 @@ public class CompInterfaceController {
 
     @Autowired
     private ValidateToken validateToken;
+    @Autowired
+    private TradePurchaseorderdetailManager tradePurchaseorderdetailManager;
+    @Autowired
+    private SysDatainterfaceOrganizationManager sysDatainterfaceOrganizationManager;
+    @Value("${page.size}")
+    private String pageSize;
 
     /**
      * 内容摘要：获取采购订单数据
@@ -31,22 +46,108 @@ public class CompInterfaceController {
     @RequestMapping(value = "/purchaseOrder/getOrder", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getOrder(String token, String startTime, String endTime, String currentPageNumber){
-        JSONObject returnJsonObj = new JSONObject();
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(startTime)
+                || StringUtils.isEmpty(endTime) || StringUtils.isEmpty(currentPageNumber) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            dataList.add(resultMap);
+        }
 
         //验证token
         Map<String, Object> map = validateToken.validateToken(token);
         Integer resultCode = (Integer) map.get("resultCode");
-        if (resultCode.equals(ResultCode.SUCCESS.getCode())) {
-            //执行逻辑
-            returnJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
-            returnJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
-
-        }else {
-            returnJsonObj.put("resultCode", map.get("resultCode"));
-            returnJsonObj.put("resultMsg", map.get("esultMsg"));
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", map.get("resultCode"));
+            resultMap.put("errorMsg", map.get("resultMsg"));
+            dataList.add(resultMap);
         }
 
-        return returnJsonObj;
+        //验证数据有效性
+        //1.页数是否为正整数
+        if(!ValidateUtil.checkCount(currentPageNumber)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_INVALID.getCode());
+            dataList.add(resultMap);
+        }
+        //2.时间格式是否正确
+        if (!ValidateUtil.checkDate(startTime) || !ValidateUtil.checkDate(endTime) ){
+            resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            dataList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (dataList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+
+
+        //执行逻辑
+        SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        format.setLenient(false);
+        try {
+            Date startDate=format.parse(startTime);
+            Date endDate=format.parse(endTime);
+            Pagination page = new Pagination();
+            Map<String, Object> paramsMap = new HashMap<String, Object>();
+            paramsMap.put("startTime", startDate);
+            paramsMap.put("endTime", endDate);
+            paramsMap.put("orderStatuses", 2);
+
+            List<String> orgId = sysDatainterfaceOrganizationManager.getData((String) map.get("orgId"));
+
+            paramsMap.put("delCompCode", orgId);
+            page.setConditions(paramsMap);
+            page.setPage(Integer.parseInt(currentPageNumber));
+            page.setCount(Integer.parseInt(pageSize) );// 每页查询数据量
+            tradePurchaseorderdetailManager.queryAllOrderDetailRecentForInterface(page);
+
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            List<TradePurchaseorderdetail> tradePurchaseorderdetailList = (List<TradePurchaseorderdetail>) page.getRows();
+            if (tradePurchaseorderdetailList != null && tradePurchaseorderdetailList.size() > 0) {
+                for (TradePurchaseorderdetail item : tradePurchaseorderdetailList) {
+                    Map dataMap = new HashMap();
+                    dataMap.put("orderId", item.getPurchaseorderid());
+                    dataMap.put("orderName", item.getPurchaseordercode());
+                    dataMap.put("orderRemarks", item.getRemark());
+                    dataMap.put("orderDetailId", item.getPurchaseorderdetailid());
+                    dataMap.put("hospitalId", item.getHosid());
+                    dataMap.put("hospitalName", item.getHosName());
+                    dataMap.put("companyNamePs", item.getComnamePs());
+                    dataMap.put("companyIdPs", item.getComidPs());
+                    dataMap.put("procurecatalogId", item.getProcurecatalogid());
+                    dataMap.put("purchaseCount", item.getPurchasecount());
+                    dataMap.put("purchasePrice", item.getPurchaseprice());
+                    dataMap.put("purchaseAmount", item.getPurchaseamount());
+                    dataMap.put("orderDetailState", item.getDetailstatus());
+                    dataMap.put("submitTime", item.getSubmittime() == null ? "" : DateFormatUtils.format(item.getSubmittime(), "yyyy-MM-dd HH:mm:ss"));
+                    dataMap.put("ordertype", item.getOrdertype());
+                    dataMap.put("totalDetailCount",item.getDetailCount());
+                    dataList.add(dataMap);
+                }
+            }
+            resultJsonObj.put("returnCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+            resultJsonObj.put("dataList", dataList);
+            resultJsonObj.put("currentPageNumber", page.getPage());// 按照数据返回正确的页码
+            resultJsonObj.put("totalPageCount", page.getTotal());
+            resultJsonObj.put("totalRecordCount", page.getRecords());
+            return resultJsonObj;
+        } catch (Exception e) {
+            log.error("Failed to getOrder", e);
+            resultJsonObj.put("returnCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage());
+            return resultJsonObj;
+        }
     }
 
     /**

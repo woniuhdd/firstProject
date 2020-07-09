@@ -3,6 +3,8 @@ package com.common.controller;
 import com.common.utils.Base64Util;
 import com.common.utils.JwtTokenUtil;
 import com.enums.ResultCode;
+import com.sys.model.SysUser;
+import com.sys.service.SysUserManager;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,6 +18,8 @@ import java.util.Map;
 public class ValidateToken {
     @Autowired
     private ValidateUser validateUser;
+    @Autowired
+    private SysUserManager sysUserManager;
 
     public Map<String, Object> validateToken(String token) {
         Map<String, Object> map = new HashMap<>();
@@ -56,8 +60,10 @@ public class ValidateToken {
             map.put("resultMsg", userMap.get("resultMsg"));
             return map;
         }
-
-        map.put("userName", username);
+        SysUser sysUser = sysUserManager.getUserByUsername(username);
+        map.put("orgId",sysUser.getOrgid());
+        map.put("userId", sysUser.getUserid());
+        map.put("userName", sysUser.getUsername());
         map.put("resultCode", ResultCode.SUCCESS.getCode());
         map.put("resultMsg", ResultCode.SUCCESS.getMessage());
         return map;
