@@ -54,73 +54,73 @@
     </sql>
 
     <sql id="common_where_if">
-        <if test="@OGNL@isNotEmpty(userid)">
+        <if test="@com.OGNL@isNotEmpty(userid)">
             AND t.USERID = #{userid}
         </if>
-        <if test="@OGNL@isNotEmpty(username)">
+        <if test="@com.OGNL@isNotEmpty(username)">
             AND t.USERNAME = #{username}
         </if>
-        <if test="@OGNL@isNotEmpty(userpwd)">
+        <if test="@com.OGNL@isNotEmpty(userpwd)">
             AND t.USERPWD = #{userpwd}
         </if>
-        <if test="@OGNL@isNotEmpty(userstatus)">
+        <if test="@com.OGNL@isNotEmpty(userstatus)">
             AND t.USERSTATUS = #{userstatus}
         </if>
-        <if test="@OGNL@isNotEmpty(loginlasttime)">
+        <if test="@com.OGNL@isNotEmpty(loginlasttime)">
             AND t.LOGINLASTTIME = #{loginlasttime}
         </if>
-        <if test="@OGNL@isNotEmpty(isadmin)">
+        <if test="@com.OGNL@isNotEmpty(isadmin)">
             AND t.ISADMIN = #{isadmin}
         </if>
-        <if test="@OGNL@isNotEmpty(extime)">
+        <if test="@com.OGNL@isNotEmpty(extime)">
             AND t.EXTIME = #{extime}
         </if>
-        <if test="@OGNL@isNotEmpty(orgid)">
+        <if test="@com.OGNL@isNotEmpty(orgid)">
             AND t.ORGID = #{orgid}
         </if>
-        <if test="@OGNL@isNotEmpty(certid)">
+        <if test="@com.OGNL@isNotEmpty(certid)">
             AND t.CERTID = #{certid}
         </if>
-        <if test="@OGNL@isNotEmpty(mustca)">
+        <if test="@com.OGNL@isNotEmpty(mustca)">
             AND t.MUSTCA = #{mustca}
         </if>
-        <if test="@OGNL@isNotEmpty(iscompany)">
+        <if test="@com.OGNL@isNotEmpty(iscompany)">
             AND t.ISCOMPANY = #{iscompany}
         </if>
-        <if test="@OGNL@isNotEmpty(departname)">
+        <if test="@com.OGNL@isNotEmpty(departname)">
             AND t.DEPARTNAME = #{departname}
         </if>
-        <if test="@OGNL@isNotEmpty(contactperson)">
+        <if test="@com.OGNL@isNotEmpty(contactperson)">
             AND t.CONTACTPERSON = #{contactperson}
         </if>
-        <if test="@OGNL@isNotEmpty(contacttel)">
+        <if test="@com.OGNL@isNotEmpty(contacttel)">
             AND t.CONTACTTEL = #{contacttel}
         </if>
-        <if test="@OGNL@isNotEmpty(id)">
+        <if test="@com.OGNL@isNotEmpty(id)">
             AND t.ID = #{id}
         </if>
-        <if test="@OGNL@isNotEmpty(certsign)">
+        <if test="@com.OGNL@isNotEmpty(certsign)">
             AND t.CERTSIGN = #{certsign}
         </if>
-        <if test="@OGNL@isNotEmpty(usertype)">
+        <if test="@com.OGNL@isNotEmpty(usertype)">
             AND t.USERTYPE = #{usertype}
         </if>
-        <if test="@OGNL@isNotEmpty(adminuserid)">
+        <if test="@com.OGNL@isNotEmpty(adminuserid)">
             AND t.ADMINUSERID = #{adminuserid}
         </if>
-        <if test="@OGNL@isNotEmpty(updateusername)">
+        <if test="@com.OGNL@isNotEmpty(updateusername)">
             AND t.UPDATEUSERNAME = #{updateusername}
         </if>
-        <if test="@OGNL@isNotEmpty(updateuserposition)">
+        <if test="@com.OGNL@isNotEmpty(updateuserposition)">
             AND t.UPDATEUSERPOSITION = #{updateuserposition}
         </if>
-        <if test="@OGNL@isNotEmpty(updateuserdepartment)">
+        <if test="@com.OGNL@isNotEmpty(updateuserdepartment)">
             AND t.UPDATEUSERDEPARTMENT = #{updateuserdepartment}
         </if>
-        <if test="@OGNL@isNotEmpty(updateuserphone)">
+        <if test="@com.OGNL@isNotEmpty(updateuserphone)">
             AND t.UPDATEUSERPHONE = #{updateuserphone}
         </if>
-        <if test="@OGNL@isNotEmpty(updateusertel)">
+        <if test="@com.OGNL@isNotEmpty(updateusertel)">
             AND t.UPDATEUSERTEL = #{updateusertel}
         </if>
     </sql>
@@ -312,91 +312,91 @@
     <update id="updateBySelective" parameterType="com.sys.model.SysUser">
         UPDATE SYS_USER
         <set>
-            <if test="@OGNL@isNotEmpty(username)">
+            <if test="@com.OGNL@isNotEmpty(username)">
                 USERNAME =
                 #{username},
             </if>
-            <if test="@OGNL@isNotEmpty(userpwd)">
+            <if test="@com.OGNL@isNotEmpty(userpwd)">
                 USERPWD =
                 #{userpwd},
             </if>
-            <if test="@OGNL@isNotEmpty(userstatus)">
+            <if test="@com.OGNL@isNotEmpty(userstatus)">
                 USERSTATUS =
                 #{userstatus},
             </if>
-            <if test="@OGNL@isNotEmpty(loginlasttime)">
+            <if test="@com.OGNL@isNotEmpty(loginlasttime)">
                 LOGINLASTTIME =
                 #{loginlasttime},
             </if>
-            <if test="@OGNL@isNotEmpty(isadmin)">
+            <if test="@com.OGNL@isNotEmpty(isadmin)">
                 ISADMIN =
                 #{isadmin},
             </if>
-            <if test="@OGNL@isNotEmpty(extime)">
+            <if test="@com.OGNL@isNotEmpty(extime)">
                 EXTIME =
                 #{extime},
             </if>
-            <if test="@OGNL@isNotEmpty(orgid)">
+            <if test="@com.OGNL@isNotEmpty(orgid)">
                 ORGID =
                 #{orgid},
             </if>
-            <if test="@OGNL@isNotEmpty(certid)">
+            <if test="@com.OGNL@isNotEmpty(certid)">
                 CERTID =
                 #{certid},
             </if>
-            <if test="@OGNL@isNotEmpty(mustca)">
+            <if test="@com.OGNL@isNotEmpty(mustca)">
                 MUSTCA =
                 #{mustca},
             </if>
-            <if test="@OGNL@isNotEmpty(iscompany)">
+            <if test="@com.OGNL@isNotEmpty(iscompany)">
                 ISCOMPANY =
                 #{iscompany},
             </if>
-            <if test="@OGNL@isNotEmpty(departname)">
+            <if test="@com.OGNL@isNotEmpty(departname)">
                 DEPARTNAME =
                 #{departname},
             </if>
-            <if test="@OGNL@isNotEmpty(contactperson)">
+            <if test="@com.OGNL@isNotEmpty(contactperson)">
                 CONTACTPERSON =
                 #{contactperson},
             </if>
-            <if test="@OGNL@isNotEmpty(contacttel)">
+            <if test="@com.OGNL@isNotEmpty(contacttel)">
                 CONTACTTEL =
                 #{contacttel},
             </if>
-            <if test="@OGNL@isNotEmpty(id)">
+            <if test="@com.OGNL@isNotEmpty(id)">
                 ID =
                 #{id},
             </if>
-            <if test="@OGNL@isNotEmpty(certsign)">
+            <if test="@com.OGNL@isNotEmpty(certsign)">
                 CERTSIGN =
                 #{certsign},
             </if>
-            <if test="@OGNL@isNotEmpty(usertype)">
+            <if test="@com.OGNL@isNotEmpty(usertype)">
                 USERTYPE =
                 #{usertype},
             </if>
-            <if test="@OGNL@isNotEmpty(adminuserid)">
+            <if test="@com.OGNL@isNotEmpty(adminuserid)">
                 ADMINUSERID =
                 #{adminuserid},
             </if>
-            <if test="@OGNL@isNotEmpty(updateusername)">
+            <if test="@com.OGNL@isNotEmpty(updateusername)">
                 UPDATEUSERNAME =
                 #{updateusername},
             </if>
-            <if test="@OGNL@isNotEmpty(updateuserposition)">
+            <if test="@com.OGNL@isNotEmpty(updateuserposition)">
                 UPDATEUSERPOSITION =
                 #{updateuserposition},
             </if>
-            <if test="@OGNL@isNotEmpty(updateuserdepartment)">
+            <if test="@com.OGNL@isNotEmpty(updateuserdepartment)">
                 UPDATEUSERDEPARTMENT =
                 #{updateuserdepartment},
             </if>
-            <if test="@OGNL@isNotEmpty(updateuserphone)">
+            <if test="@com.OGNL@isNotEmpty(updateuserphone)">
                 UPDATEUSERPHONE =
                 #{updateuserphone},
             </if>
-            <if test="@OGNL@isNotEmpty(updateusertel)">
+            <if test="@com.OGNL@isNotEmpty(updateusertel)">
                 UPDATEUSERTEL =
                 #{updateusertel},
             </if>
@@ -416,8 +416,8 @@
         <include refid="full-columns" />
         FROM SYS_USER t
         <where>
-            <if test="@OGNL@isNotEmpty(userId)">
-                WHERE t.USERID = #{userId}
+            <if test="@com.OGNL@isNotEmpty(userId)">
+                 t.USERID = #{userId}
             </if>
         </where>
 

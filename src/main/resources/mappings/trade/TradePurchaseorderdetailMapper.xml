@@ -52,58 +52,58 @@
 	</sql>
 	
 	<sql id="common_where_if">
-			<if test="@OGNL@isNotEmpty(purchaseorderdetailid)">
+			<if test="@com.OGNL@isNotEmpty(purchaseorderdetailid)">
 				AND t.PURCHASEORDERDETAILID = #{purchaseorderdetailid}
 			</if>
-			<if test="@OGNL@isNotEmpty(purchaseorderid)">
+			<if test="@com.OGNL@isNotEmpty(purchaseorderid)">
 				AND t.PURCHASEORDERID = #{purchaseorderid}
 			</if>
-			<if test="@OGNL@isNotEmpty(procurecatalogid)">
+			<if test="@com.OGNL@isNotEmpty(procurecatalogid)">
 				AND t.PROCURECATALOGID = #{procurecatalogid}
 			</if>
-			<if test="@OGNL@isNotEmpty(purchasecount)">
+			<if test="@com.OGNL@isNotEmpty(purchasecount)">
 				AND t.PURCHASECOUNT = #{purchasecount}
 			</if>
-			<if test="@OGNL@isNotEmpty(purchaseprice)">
+			<if test="@com.OGNL@isNotEmpty(purchaseprice)">
 				AND t.PURCHASEPRICE = #{purchaseprice}
 			</if>
-			<if test="@OGNL@isNotEmpty(purchaseamount)">
+			<if test="@com.OGNL@isNotEmpty(purchaseamount)">
 				AND t.PURCHASEAMOUNT = #{purchaseamount}
 			</if>
-			<if test="@OGNL@isNotEmpty(comidPs)">
+			<if test="@com.OGNL@isNotEmpty(comidPs)">
 				AND t.COMID_PS = #{comidPs}
 			</if>
-			<if test="@OGNL@isNotEmpty(comnamePs)">
+			<if test="@com.OGNL@isNotEmpty(comnamePs)">
 				AND t.COMNAME_PS = #{comnamePs}
 			</if>
-			<if test="@OGNL@isNotEmpty(comidTb)">
+			<if test="@com.OGNL@isNotEmpty(comidTb)">
 				AND t.COMID_TB = #{comidTb}
 			</if>
-			<if test="@OGNL@isNotEmpty(comnameTb)">
+			<if test="@com.OGNL@isNotEmpty(comnameTb)">
 				AND t.COMNAME_TB = #{comnameTb}
 			</if>
-			<if test="@OGNL@isNotEmpty(comnameSc)">
+			<if test="@com.OGNL@isNotEmpty(comnameSc)">
 				AND t.COMNAME_SC = #{comnameSc}
 			</if>
-			<if test="@OGNL@isNotEmpty(detailstatus)">
+			<if test="@com.OGNL@isNotEmpty(detailstatus)">
 				AND t.DETAILSTATUS = #{detailstatus}
 			</if>
-			<if test="@OGNL@isNotEmpty(detailcontime)">
+			<if test="@com.OGNL@isNotEmpty(detailcontime)">
 				AND t.DETAILCONTIME = #{detailcontime}
 			</if>
-			<if test="@OGNL@isNotEmpty(ndisreson)">
+			<if test="@com.OGNL@isNotEmpty(ndisreson)">
 				AND t.NDISRESON = #{ndisreson}
 			</if>
-			<if test="@OGNL@isNotEmpty(eduptime)">
+			<if test="@com.OGNL@isNotEmpty(eduptime)">
 				AND t.EDUPTIME = #{eduptime}
 			</if>
-			<if test="@OGNL@isNotEmpty(refuseretreson)">
+			<if test="@com.OGNL@isNotEmpty(refuseretreson)">
 				AND t.REFUSERETRESON = #{refuseretreson}
 			</if>
-			<if test="@OGNL@isNotEmpty(podetailid)">
+			<if test="@com.OGNL@isNotEmpty(podetailid)">
 				AND t.PODETAILID = #{podetailid}
 			</if>
-			<if test="@OGNL@isNotEmpty(purchasedetailcontime)">
+			<if test="@com.OGNL@isNotEmpty(purchasedetailcontime)">
 				AND t.PURCHASEDETAILCONTIME = #{purchasedetailcontime}
 			</if>
 	</sql>
@@ -267,71 +267,71 @@
 	<update id="updateBySelective" parameterType="com.trade.model.TradePurchaseorderdetail">
 		UPDATE TRADE_PURCHASEORDERDETAIL
 		<set>
-			<if test="@OGNL@isNotEmpty(purchaseorderid)">
+			<if test="@com.OGNL@isNotEmpty(purchaseorderid)">
 				PURCHASEORDERID =
 				#{purchaseorderid},
 			</if>
-			<if test="@OGNL@isNotEmpty(procurecatalogid)">
+			<if test="@com.OGNL@isNotEmpty(procurecatalogid)">
 				PROCURECATALOGID =
 				#{procurecatalogid},
 			</if>
-			<if test="@OGNL@isNotEmpty(purchasecount)">
+			<if test="@com.OGNL@isNotEmpty(purchasecount)">
 				PURCHASECOUNT =
 				#{purchasecount},
 			</if>
-			<if test="@OGNL@isNotEmpty(purchaseprice)">
+			<if test="@com.OGNL@isNotEmpty(purchaseprice)">
 				PURCHASEPRICE =
 				#{purchaseprice},
 			</if>
-			<if test="@OGNL@isNotEmpty(purchaseamount)">
+			<if test="@com.OGNL@isNotEmpty(purchaseamount)">
 				PURCHASEAMOUNT =
 				#{purchaseamount},
 			</if>
-			<if test="@OGNL@isNotEmpty(comidPs)">
+			<if test="@com.OGNL@isNotEmpty(comidPs)">
 				COMID_PS =
 				#{comidPs},
 			</if>
-			<if test="@OGNL@isNotEmpty(comnamePs)">
+			<if test="@com.OGNL@isNotEmpty(comnamePs)">
 				COMNAME_PS =
 				#{comnamePs},
 			</if>
-			<if test="@OGNL@isNotEmpty(comidTb)">
+			<if test="@com.OGNL@isNotEmpty(comidTb)">
 				COMID_TB =
 				#{comidTb},
 			</if>
-			<if test="@OGNL@isNotEmpty(comnameTb)">
+			<if test="@com.OGNL@isNotEmpty(comnameTb)">
 				COMNAME_TB =
 				#{comnameTb},
 			</if>
-			<if test="@OGNL@isNotEmpty(comnameSc)">
+			<if test="@com.OGNL@isNotEmpty(comnameSc)">
 				COMNAME_SC =
 				#{comnameSc},
 			</if>
-			<if test="@OGNL@isNotEmpty(detailstatus)">
+			<if test="@com.OGNL@isNotEmpty(detailstatus)">
 				DETAILSTATUS =
 				#{detailstatus},
 			</if>
-			<if test="@OGNL@isNotEmpty(detailcontime)">
+			<if test="@com.OGNL@isNotEmpty(detailcontime)">
 				DETAILCONTIME =
 				#{detailcontime},
 			</if>
-			<if test="@OGNL@isNotEmpty(ndisreson)">
+			<if test="@com.OGNL@isNotEmpty(ndisreson)">
 				NDISRESON =
 				#{ndisreson},
 			</if>
-			<if test="@OGNL@isNotEmpty(eduptime)">
+			<if test="@com.OGNL@isNotEmpty(eduptime)">
 				EDUPTIME =
 				#{eduptime},
 			</if>
-			<if test="@OGNL@isNotEmpty(refuseretreson)">
+			<if test="@com.OGNL@isNotEmpty(refuseretreson)">
 				REFUSERETRESON =
 				#{refuseretreson},
 			</if>
-			<if test="@OGNL@isNotEmpty(podetailid)">
+			<if test="@com.OGNL@isNotEmpty(podetailid)">
 				PODETAILID =
 				#{podetailid},
 			</if>
-			<if test="@OGNL@isNotEmpty(purchasedetailcontime)">
+			<if test="@com.OGNL@isNotEmpty(purchasedetailcontime)">
 				PURCHASEDETAILCONTIME =
 				#{purchasedetailcontime},
 			</if>
@@ -361,19 +361,19 @@
 		) tab_count on tab_count.PURCHASEORDERID= o.PURCHASEORDERID
 		left join trade_hos h on  h.id=o.HOSID
 		<where>
-			<if test="@OGNL@isNotEmpty(delCompCode)">
+			<if test="@com.OGNL@isNotEmpty(delCompCode)">
 				AND t.COMID_PS IN
 				<foreach collection="delCompCode" item="item" open="(" separator="," close=")">
 					#{item}
 				</foreach>
 			</if>
-			<if test="@OGNL@isNotEmpty(startTime)">
+			<if test="@com.OGNL@isNotEmpty(startTime)">
 				AND o.SUBMITTIME >= #{startTime}
 			</if>
-			<if test="@OGNL@isNotEmpty(endTime)">
+			<if test="@com.OGNL@isNotEmpty(endTime)">
 				AND #{endTime} >= o.SUBMITTIME
 			</if>
-			<if test="@OGNL@isNotEmpty(orderStatuses)">
+			<if test="@com.OGNL@isNotEmpty(orderStatuses)">
 				AND o.ORDERSTATUS = #{orderStatuses}
 			</if>
 		</where>
@@ -442,7 +442,7 @@
 		LEFT JOIN TRADE_HOS h ON a.HOSID=h.ID
 		where
 		1=1
-		<if test="@OGNL@isNotEmpty(startTime) and @OGNL@isNotEmpty(endTime)">
+		<if test="@com.OGNL@isNotEmpty(startTime) and @com.OGNL@isNotEmpty(endTime)">
 			AND a.opertime &gt;=TO_DATE( #{startTime},'yyyy-mm-dd hh24:mi:ss')
 			AND a.opertime &lt;=TO_DATE (#{endTime},'yyyy-mm-dd hh24:mi:ss')
 		</if>

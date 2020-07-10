@@ -19,8 +19,8 @@ public class TradePurchaseorderdetailManagerImpl extends GenericManagerImpl<Trad
     public Pagination queryAllOrderDetailRecentForInterface(Pagination page) {
         PageHelper.startPage(page.getPage(), page.getCount(), page.getOrderby());
         Page<TradePurchaseorderdetail> models = (Page<TradePurchaseorderdetail>) tradePurchaseorderdetailDao.queryAllOrderDetailRecentForInterface(page.getConditions());
-        page.setRows(models);
         page.setRecords(models.getTotal());
+        page.setRows(models);
         return page;
     }
 }

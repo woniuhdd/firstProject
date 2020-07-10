@@ -51,52 +51,52 @@
 		SELECT count(1)
 		FROM sys_datainterface_organization t
 		<where>
-			<if test="@OGNL@isNotEmpty(id)">
+			<if test="@com.OGNL@isNotEmpty(id)">
 				AND t.id = #{id}
 			</if>
-			<if test="@OGNL@isNotEmpty(orgId)">
+			<if test="@com.OGNL@isNotEmpty(orgId)">
 				AND t.org_id = #{orgId}
 			</if>
-			<if test="@OGNL@isNotEmpty(orgUserName)">
+			<if test="@com.OGNL@isNotEmpty(orgUserName)">
 				AND t.org_user_name = #{orgUserName}
 			</if>
-			<if test="@OGNL@isNotEmpty(departmentUserName)">
+			<if test="@com.OGNL@isNotEmpty(departmentUserName)">
 				AND t.department_user_name = #{departmentUserName}
 			</if>
-			<if test="@OGNL@isNotEmpty(orgType)">
+			<if test="@com.OGNL@isNotEmpty(orgType)">
 				AND t.org_type = #{orgType}
 			</if>
-			<if test="@OGNL@isNotEmpty(departmentId)">
+			<if test="@com.OGNL@isNotEmpty(departmentId)">
 				AND t.department_id = #{departmentId}
 			</if>
-			<if test="@OGNL@isNotEmpty(publicKey)">
+			<if test="@com.OGNL@isNotEmpty(publicKey)">
 				AND t.public_key = #{publicKey}
 			</if>
-			<if test="@OGNL@isNotEmpty(privateKey)">
+			<if test="@com.OGNL@isNotEmpty(privateKey)">
 				AND t.private_key = #{privateKey}
 			</if>
-			<if test="@OGNL@isNotEmpty(ipv4)">
+			<if test="@com.OGNL@isNotEmpty(ipv4)">
 				AND t.ipv4 = #{ipv4}
 			</if>
-			<if test="@OGNL@isNotEmpty(accessToken)">
+			<if test="@com.OGNL@isNotEmpty(accessToken)">
 				AND t.access_token = #{accessToken}
 			</if>
-			<if test="@OGNL@isNotEmpty(expireTime)">
+			<if test="@com.OGNL@isNotEmpty(expireTime)">
 				AND t.expire_time = #{expireTime}
 			</if>
-			<if test="@OGNL@isNotEmpty(isUsing)">
+			<if test="@com.OGNL@isNotEmpty(isUsing)">
 				AND t.is_using = #{isUsing}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastAccessTime)">
+			<if test="@com.OGNL@isNotEmpty(lastAccessTime)">
 				AND t.last_access_time = #{lastAccessTime}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateUserId)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateUserId)">
 				AND t.last_update_user_id = #{lastUpdateUserId}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateUserName)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateUserName)">
 				AND t.last_update_user_name = #{lastUpdateUserName}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateTime)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateTime)">
 				AND t.last_update_time = #{lastUpdateTime}
 			</if>
 		</where>
@@ -106,52 +106,52 @@
 		SELECT <include refid="full-columns" />
 		FROM sys_datainterface_organization t
 		<where>
-			<if test="@OGNL@isNotEmpty(id)">
+			<if test="@com.OGNL@isNotEmpty(id)">
 				AND t.id = #{id}
 			</if>
-			<if test="@OGNL@isNotEmpty(orgId)">
+			<if test="@com.OGNL@isNotEmpty(orgId)">
 				AND t.org_id = #{orgId}
 			</if>
-			<if test="@OGNL@isNotEmpty(orgUserName)">
+			<if test="@com.OGNL@isNotEmpty(orgUserName)">
 				AND t.org_user_name = #{orgUserName}
 			</if>
-			<if test="@OGNL@isNotEmpty(departmentUserName)">
+			<if test="@com.OGNL@isNotEmpty(departmentUserName)">
 				AND t.department_user_name = #{departmentUserName}
 			</if>
-			<if test="@OGNL@isNotEmpty(orgType)">
+			<if test="@com.OGNL@isNotEmpty(orgType)">
 				AND t.org_type = #{orgType}
 			</if>
-			<if test="@OGNL@isNotEmpty(departmentId)">
+			<if test="@com.OGNL@isNotEmpty(departmentId)">
 				AND t.department_id = #{departmentId}
 			</if>
-			<if test="@OGNL@isNotEmpty(publicKey)">
+			<if test="@com.OGNL@isNotEmpty(publicKey)">
 				AND t.public_key = #{publicKey}
 			</if>
-			<if test="@OGNL@isNotEmpty(privateKey)">
+			<if test="@com.OGNL@isNotEmpty(privateKey)">
 				AND t.private_key = #{privateKey}
 			</if>
-			<if test="@OGNL@isNotEmpty(ipv4)">
+			<if test="@com.OGNL@isNotEmpty(ipv4)">
 				AND t.ipv4 = #{ipv4}
 			</if>
-			<if test="@OGNL@isNotEmpty(accessToken)">
+			<if test="@com.OGNL@isNotEmpty(accessToken)">
 				AND t.access_token = #{accessToken}
 			</if>
-			<if test="@OGNL@isNotEmpty(expireTime)">
+			<if test="@com.OGNL@isNotEmpty(expireTime)">
 				AND t.expire_time = #{expireTime}
 			</if>
-			<if test="@OGNL@isNotEmpty(isUsing)">
+			<if test="@com.OGNL@isNotEmpty(isUsing)">
 				AND t.is_using = #{isUsing}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastAccessTime)">
+			<if test="@com.OGNL@isNotEmpty(lastAccessTime)">
 				AND t.last_access_time = #{lastAccessTime}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateUserId)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateUserId)">
 				AND t.last_update_user_id = #{lastUpdateUserId}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateUserName)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateUserName)">
 				AND t.last_update_user_name = #{lastUpdateUserName}
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateTime)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateTime)">
 				AND t.last_update_time = #{lastUpdateTime}
 			</if>
 		</where>
@@ -261,49 +261,49 @@
 	<update id="updateBySelective" parameterType="com.sys.model.SysDatainterfaceOrganization">
 		UPDATE sys_datainterface_organization
 		<set>
-			<if test="@OGNL@isNotEmpty(orgId)">
+			<if test="@com.OGNL@isNotEmpty(orgId)">
 				org_id = #{orgId},
 			</if>
-			<if test="@OGNL@isNotEmpty(orgUserName)">
+			<if test="@com.OGNL@isNotEmpty(orgUserName)">
 				org_user_name = #{orgUserName},
 			</if>
-			<if test="@OGNL@isNotEmpty(departmentUserName)">
+			<if test="@com.OGNL@isNotEmpty(departmentUserName)">
 				department_user_name = #{departmentUserName},
 			</if>
-			<if test="@OGNL@isNotEmpty(orgType)">
+			<if test="@com.OGNL@isNotEmpty(orgType)">
 				org_type = #{orgType},
 			</if>
-			<if test="@OGNL@isNotEmpty(departmentId)">
+			<if test="@com.OGNL@isNotEmpty(departmentId)">
 				department_id = #{departmentId},
 			</if>
-			<if test="@OGNL@isNotEmpty(publicKey)">
+			<if test="@com.OGNL@isNotEmpty(publicKey)">
 				public_key = #{publicKey},
 			</if>
-			<if test="@OGNL@isNotEmpty(privateKey)">
+			<if test="@com.OGNL@isNotEmpty(privateKey)">
 				private_key = #{privateKey},
 			</if>
-			<if test="@OGNL@isNotEmpty(ipv4)">
+			<if test="@com.OGNL@isNotEmpty(ipv4)">
 				ipv4 = #{ipv4},
 			</if>
-			<if test="@OGNL@isNotEmpty(accessToken)">
+			<if test="@com.OGNL@isNotEmpty(accessToken)">
 				access_token = #{accessToken},
 			</if>
-			<if test="@OGNL@isNotEmpty(expireTime)">
+			<if test="@com.OGNL@isNotEmpty(expireTime)">
 				expire_time = #{expireTime},
 			</if>
-			<if test="@OGNL@isNotEmpty(isUsing)">
+			<if test="@com.OGNL@isNotEmpty(isUsing)">
 				is_using = #{isUsing},
 			</if>
-			<if test="@OGNL@isNotEmpty(lastAccessTime)">
+			<if test="@com.OGNL@isNotEmpty(lastAccessTime)">
 				last_access_time = #{lastAccessTime},
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateUserId)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateUserId)">
 				last_update_user_id = #{lastUpdateUserId},
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateUserName)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateUserName)">
 				last_update_user_name = #{lastUpdateUserName},
 			</if>
-			<if test="@OGNL@isNotEmpty(lastUpdateTime)">
+			<if test="@com.OGNL@isNotEmpty(lastUpdateTime)">
 				last_update_time = now(),
 			</if>
 		</set>
@@ -318,7 +318,7 @@
 		SELECT ORG_ID
 		FROM SYS_DATAINTERFACE_ORGANIZATION t
 		<where>
-			<if test="@OGNL@isNotEmpty(orgId)">
+			<if test="@com.OGNL@isNotEmpty(orgId)">
 				AND	t.ORG_ID = #{orgId}
 				OR t.FATHER_ID = #{orgId}
 			</if>
@@ -330,7 +330,7 @@
 		from sys_datainterface_organization t 
 		<where>
 			t.org_type NOT IN (4, 7)
-			<if test="@OGNL@isNotEmpty(orgUserName)">
+			<if test="@com.OGNL@isNotEmpty(orgUserName)">
 				AND t.org_user_name = #{orgUserName}
 		    </if>
 		</where>
