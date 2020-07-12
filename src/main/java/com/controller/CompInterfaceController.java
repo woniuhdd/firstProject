@@ -4,21 +4,16 @@ import com.alibaba.fastjson.JSONObject;
 import com.common.controller.ValidateDistributeInfo;
 import com.common.controller.ValidateToken;
 import com.common.utils.Pagination;
+import com.common.utils.ToolUtils;
 import com.common.utils.ValidateUtil;
 import com.enums.ResultCode;
+import com.github.pagehelper.Page;
 import com.model.DisBatch;
 import com.model.DistributeInfo;
 import com.model.ValidateResult;
-import com.github.pagehelper.Page;
 import com.sys.service.SysDatainterfaceOrganizationManager;
-import com.trade.model.BaseHospital;
-import com.trade.model.TradeCominfo;
-import com.trade.model.TradeDruginfo;
-import com.trade.model.TradePurchaseorderdetail;
-import com.trade.service.BaseHospitalManager;
-import com.trade.service.TradeCominfoManager;
-import com.trade.service.TradeDruginfoManager;
-import com.trade.service.TradePurchaseorderdetailManager;
+import com.trade.model.*;
+import com.trade.service.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
 import org.slf4j.Logger;
@@ -45,14 +40,16 @@ public class CompInterfaceController {
     private TradePurchaseorderdetailManager tradePurchaseorderdetailManager;
     @Autowired
     private SysDatainterfaceOrganizationManager sysDatainterfaceOrganizationManager;
-    @Value("${page.size}")
-    private String pageSize;
+    @Autowired
+    private TradeDisrecManager tradeDisrecManager;
     @Autowired
     private BaseHospitalManager baseHospitalManager;
     @Autowired
     private TradeCominfoManager tradeCominfoManager;
     @Autowired
     private TradeDruginfoManager tradeDruginfoManager;
+    @Value("${page.size}")
+    private String pageSize;
 
     /**
      * 内容摘要：获取采购订单数据
@@ -152,8 +149,8 @@ public class CompInterfaceController {
                     dataList.add(dataMap);
                 }
             }
-            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
             resultJsonObj.put("dataList", dataList);
             resultJsonObj.put("currentPageNumber", page.getPage());// 按照数据返回正确的页码
             resultJsonObj.put("totalPageCount", page.getTotal());
@@ -161,8 +158,8 @@ public class CompInterfaceController {
             return resultJsonObj;
         } catch (Exception e) {
             log.error("Failed to getOrder", e);
-            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
             return resultJsonObj;
         }
     }
@@ -178,6 +175,7 @@ public class CompInterfaceController {
     @ResponseBody
     public JSONObject distribute(String token, String distributeInfo){
         JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
         List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
@@ -189,11 +187,11 @@ public class CompInterfaceController {
         }
 
         //验证token
-        Map<String, Object> map = validateToken.validateToken(token);
-        Integer resultCode = (Integer) map.get("resultCode");
+        Map<String, Object> tokenMap = validateToken.validateToken(token);
+        Integer resultCode = (Integer) tokenMap.get("resultCode");
         if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
-            resultMap.put("errorCode", map.get("resultCode"));
-            resultMap.put("errorMsg", map.get("resultMsg"));
+            resultMap.put("errorCode", tokenMap.get("resultCode"));
+            resultMap.put("errorMsg", tokenMap.get("resultMsg"));
             errorList.add(resultMap);
         }
 
@@ -217,8 +215,8 @@ public class CompInterfaceController {
             //4、数据库交互验证订单明细是否存在，配送数量 是否符合
             List<Map<String, Object>> checkList;
             Map<String, Object> checkDetailMap = new HashMap<>();//存储list，用于校验接口数据
-            checkDetailMap.put("detailList", validateResult.getCompanyDistributeList());//设置订单明细集合
-            checkList = purchaseorderdetailManager.checkDistributeDataByInterface(checkDetailMap);
+            checkDetailMap.put("detailList", validateResult.getDistributeInfoList());//设置订单明细集合
+            checkList = tradePurchaseorderdetailManager.checkDistributeData(checkDetailMap);
             for (int i = 0; i < checkList.size(); i++) {
                 Map<String, Object> map = checkList.get(i);
                 String orderDetailId = map.get("ORDERDETAILID").toString();//订单明细编号
@@ -236,29 +234,29 @@ public class CompInterfaceController {
                 //数据不存在
                 if (isExists.equals("0")) {
                     JSONObject errorMap = new JSONObject();
-                    errorMap.put("errorCode", ErrorCodeCompany.DATA_NOT_FOUND.getKey());
-                    errorMap.put("errorMsg", ErrorCodeCompany.DATA_NOT_FOUND.getValue());
+                    errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage());
                     errorReasonList.add(errorMap);
                 } else if (isCanDistribute.equals("0")) {   //数据状态不符合
                     JSONObject errorMap = new JSONObject();
-                    errorMap.put("errorCode", ErrorCodeCompany.DATA_STATUS_ERROR.getKey());
-                    errorMap.put("errorMsg", ErrorCodeCompany.DATA_STATUS_ERROR.getValue() + "【当前数据状态为[" + com.hsnn.medstgmini.base.enums.OrderDetaillStatus.getValueByKey(Integer.parseInt(orderDetailState)) + "]已不可配送】");
+                    errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage() + "【当前数据状态为[" + com.enums.OrderDetailStatus.getValueByKey(Integer.parseInt(orderDetailState)) + "]已不可配送】");
                     errorReasonList.add(errorMap);
                 } else if (isMorePurchaseCount.equals("1")) {   //配送大于采购量
                     JSONObject errorMap = new JSONObject();
-                    errorMap.put("errorCode", ErrorCodeCompany.DISTRIBUTE_NUMBER_ERROR.getKey());
-                    errorMap.put("errorMsg", ErrorCodeCompany.DISTRIBUTE_NUMBER_ERROR.getValue() + "【当前数据企业配送总量大于医疗机构采购量】");
+                    errorMap.put("errorCode", ResultCode.DISTRIBUTE_NUMBER_ERROR.getCode());
+                    errorMap.put("errorMsg", ResultCode.DISTRIBUTE_NUMBER_ERROR.getMessage() + "【当前数据企业配送总量大于医疗机构采购量】");
                     errorReasonList.add(errorMap);
                 } else if (isCanDis.equals("1")) {
                     JSONObject errorMap = new JSONObject();
-                    errorMap.put("errorCode", ErrorCodeCompany.DATA_STATUS_ERROR.getKey());
-                    errorMap.put("errorMsg", ErrorCodeCompany.DATA_STATUS_ERROR.getValue() + "【当前数据状态[订单已过期]已不可配送】");
+                    errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage()  + "【当前数据状态[订单已过期]已不可配送】");
                     errorReasonList.add(errorMap);
                 }
-                if (!companyIdPs.toLowerCase().equals(mapAskToken.get("orgId").toString().toLowerCase())) {   //非本企业数据,转为小写比较，防止医疗机构提交数据与平台大小写不一致
+                if (!companyIdPs.toLowerCase().equals(tokenMap.get("orgId").toString().toLowerCase())) {   //非本企业数据,转为小写比较，防止医疗机构提交数据与平台大小写不一致
                     JSONObject errorMap = new JSONObject();
-                    errorMap.put("errorCode", ErrorCodeCompany.DATA_NOT_FOUND.getKey());
-                    errorMap.put("errorMsg", ErrorCodeCompany.DATA_NOT_FOUND.getValue() + "【非本企业数据，请勿操作；如发现多次操作，系统将取消接口权限】");
+                    errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage() + "【非本企业数据，请勿操作；如发现多次操作，系统将取消接口权限】");
                     errorReasonList.add(errorMap);
                 }
                 //如果发生错误，则添加错误原因
@@ -269,8 +267,8 @@ public class CompInterfaceController {
             }
 
             if (errorList.size() != 0) {
-                resultJsonObj.put("returnCode", ResultCode.FAIL.getCode());
-                resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
                 resultJsonObj.put("errorList", errorList);
                 return resultJsonObj;
             }
@@ -280,9 +278,9 @@ public class CompInterfaceController {
             List<DisBatch> batchList = new ArrayList<>();
             //发票信息
             List<TradeInvoiceDis> invoiceList = new ArrayList<>();
-            for (DistributeInfo recent : validateResult.getCompanyDistributeList()) {
+            for (DistributeInfo recent : validateResult.getDistributeInfoList()) {
                 //获取本次配送编号
-                String disTriId = PrimaryKeyUtil.getPrimaryId(RequestType.Interface);
+                String disTriId = ToolUtils.getPrimaryId("2");
                 //设置对应关系，待成功返回时，反馈给企业
                 JSONObject detailMap = new JSONObject();
                 detailMap.put("companyDistributeId", recent.getCompanyDistributeId());
@@ -298,7 +296,7 @@ public class CompInterfaceController {
                     batchList.add(batch);
                 }
 
-                if (!org.apache.commons.lang.StringUtils.isEmpty(recent.getFirstInviceID())) {
+                if (!StringUtils.isEmpty(recent.getFirstInviceID())) {
                     String[] firstInvoiceStr = recent.getFirstInviceID().split(";");
                     if (firstInvoiceStr.length > 0) {
                         for (String iems : firstInvoiceStr) {
@@ -310,7 +308,7 @@ public class CompInterfaceController {
                     }
 
                 }
-                if (!org.apache.commons.lang.StringUtils.isEmpty(recent.getMiddleInviceID())) {
+                if (!StringUtils.isEmpty(recent.getMiddleInviceID())) {
                     String[] middleInvoiceStr = recent.getMiddleInviceID().split(";");
                     if (middleInvoiceStr.length > 0) {
                         for (String iems : middleInvoiceStr) {
@@ -322,7 +320,7 @@ public class CompInterfaceController {
                     }
 
                 }
-                if (!org.apache.commons.lang.StringUtils.isEmpty(recent.getSecondInviceID())) {
+                if (!StringUtils.isEmpty(recent.getSecondInviceID())) {
                     String[] secondInvoiceStr = recent.getSecondInviceID().split(";");
                     if (secondInvoiceStr.length > 0) {
                         for (String iems : secondInvoiceStr) {
@@ -336,21 +334,21 @@ public class CompInterfaceController {
                 }
             }
             Map<String, Object> map = new HashMap<String, Object>();
-            map.put("distributeList", nowValidateResult.getCompanyDistributeList());
+            map.put("distributeList", validateResult.getDistributeInfoList());
             map.put("distributeBatchList", batchList);
             map.put("invoiceList", invoiceList);
-            map.put("userId", mapAskToken.get("userId").toString());
-            map.put("userName", mapAskToken.get("userName").toString());
+            map.put("userId", tokenMap.get("userId").toString());
+            map.put("userName", tokenMap.get("userName").toString());
             //与数据库交互
             //省平台直接交换，
             int num = tradeDisrecManager.addDistributeDataByDistributeProvince(map);
             if (num > 0) {
-                resultJsonObj.put("returnCode", ResultCode.SUCCESS.getCode());
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
                 resultJsonObj.put("successList", successList);
             } else {
-                resultJsonObj.put("returnCode", ResultCode.FAIL.getCode());// 配送失败
-                resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【配送数据不存在】");
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());// 配送失败
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【配送数据不存在】");
             }
         } catch (Exception e) {
             //插入执行日志
@@ -374,6 +372,35 @@ public class CompInterfaceController {
     @RequestMapping(value = "/invoice/addInvoice", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject addInvoice(String token, String invoiceInfo){
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(invoiceInfo) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            errorList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> tokenMap = validateToken.validateToken(token);
+        Integer resultCode = (Integer) tokenMap.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", tokenMap.get("resultCode"));
+            resultMap.put("errorMsg", tokenMap.get("resultMsg"));
+            errorList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (errorList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+
         return  null;
     }
 
@@ -499,16 +526,16 @@ public class CompInterfaceController {
                     dataList.add(retMap);
                 }
             }
-            resultJsonObj.put("returnCode", ResultCode.SUCCESS.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
             resultJsonObj.put("currentPageNumber", cur);// 按照数据返回正确的页码
             resultJsonObj.put("totalPageCount", totalPages);
             resultJsonObj.put("totalRecordCount", total);
             resultJsonObj.put("dataList", dataList);
         } catch (Exception e) {
             log.error("Failed to confirmOrder", e);
-            resultJsonObj.put("returnCode", ResultCode.FAIL.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
         }
 
         return resultJsonObj;
@@ -638,9 +665,9 @@ public class CompInterfaceController {
                     retMap.put("lastUpdateTime", tradeDruginfo.getLastUpdateTime()== null ? "" : DateFormatUtils.format(tradeDruginfo.getLastUpdateTime(), "yyyy-MM-dd"));
                     dataList.add(retMap);
                 }
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getCode());
             } else {
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
             }
             resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
             //总页数
@@ -653,7 +680,7 @@ public class CompInterfaceController {
         } catch (Exception e) {
             log.error("Failed to getCompany", e);
             resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
             resultJsonObj.put("totalPageCount", "");
             resultJsonObj.put("dataList", dataList);
             return resultJsonObj;
@@ -764,11 +791,11 @@ public class CompInterfaceController {
                     retMap.put("lastUpdateTime", tradeCominfo.getLastUpdateTime()== null ? "" : DateFormatUtils.format(tradeCominfo.getLastUpdateTime(), "yyyy-MM-dd"));
                     dataList.add(retMap);
                 }
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getCode());
             } else {
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
             }
-            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
             //总页数
             resultJsonObj.put("totalPageCount", totalPages);
             //当前页码
@@ -778,8 +805,8 @@ public class CompInterfaceController {
             resultJsonObj.put("dataList", dataList);
         } catch (Exception e) {
             log.error("Failed to getCompany", e);
-            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
             resultJsonObj.put("totalPageCount", "");
             resultJsonObj.put("dataList", dataList);
             return resultJsonObj;
@@ -886,11 +913,11 @@ public class CompInterfaceController {
                     retMap.put("lastUpdateTime", baseHospital.getLastUpdateTime()== null ? "" : DateFormatUtils.format(baseHospital.getLastUpdateTime(), "yyyy-MM-dd"));
                     dataList.add(retMap);
                 }
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
             } else {
-                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
             }
-            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
             //总页数
             resultJsonObj.put("totalPageCount", totalPages);
             //当前页码
@@ -900,8 +927,8 @@ public class CompInterfaceController {
             resultJsonObj.put("hospInfList", dataList);
         } catch (Exception e) {
             log.error("Failed to getHospital", e);
-            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
             resultJsonObj.put("totalPageCount", "");
             resultJsonObj.put("hospInfList", dataList);
             return resultJsonObj;

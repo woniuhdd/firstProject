@@ -381,7 +381,7 @@
 	</select>
 
 	<!--C005 配送订单验证订单明细状态-->
-	<select id="checkDistributeDataByInterface" parameterType="java.util.List" resultType="hashmap">
+	<select id="checkDistributeData" parameterType="java.util.List" resultType="hashmap">
 		SELECT
 		a.company_Distribute_id companyDistributeId,
 		a.order_detail_id orderDetailId,

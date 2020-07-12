@@ -13,4 +13,6 @@ public interface TradePurchaseorderdetailDao extends GenericDao<TradePurchaseord
     List<TradePurchaseorderdetail> queryAllOrderDetailRecentForInterface(Map<String, Object> map);
 
     List<TradePurchaseorderdetail>  getCancelPurchaseOrder(Map<String, Object> map);
+
+    List<Map<String, Object>> checkDistributeData(Map<String, Object> disDataList);
 }

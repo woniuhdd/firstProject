@@ -9,6 +9,11 @@ public class DistributeInfo {
     private String disTime;
     private Map<String,Object> batchList;
     private  Integer discount;
+    private String distributeId;
+
+    private String firstInviceID;
+    private  String middleInviceID;
+    private String secondInviceID;
 
     public String getCompanyDistributeId() {
         return companyDistributeId;
@@ -48,5 +53,37 @@ public class DistributeInfo {
 
     public void setDiscount(Integer discount) {
         this.discount = discount;
+    }
+
+    public String getDistributeId() {
+        return distributeId;
+    }
+
+    public void setDistributeId(String distributeId) {
+        this.distributeId = distributeId;
+    }
+
+    public String getFirstInviceID() {
+        return firstInviceID;
+    }
+
+    public void setFirstInviceID(String firstInviceID) {
+        this.firstInviceID = firstInviceID;
+    }
+
+    public String getMiddleInviceID() {
+        return middleInviceID;
+    }
+
+    public void setMiddleInviceID(String middleInviceID) {
+        this.middleInviceID = middleInviceID;
+    }
+
+    public String getSecondInviceID() {
+        return secondInviceID;
+    }
+
+    public void setSecondInviceID(String secondInviceID) {
+        this.secondInviceID = secondInviceID;
     }
 }

@@ -1,0 +1,567 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trade.dao.TradeDisrecDao">
+	<resultMap type="com.trade.model.TradeDisrec" id="BaseResultMap">
+		<result property="disrecid" column="DISRECID" javaType="String" />
+		<result property="purchaseorderdetailid" column="PURCHASEORDERDETAILID" javaType="String" />
+		<result property="discount" column="DISCOUNT" javaType="Long" />
+		<result property="disamount" column="DISAMOUNT" javaType="BigDecimal" />
+		<result property="distime" column="DISTIME" javaType="Date" />
+		<result property="reccount" column="RECCOUNT" javaType="Long" />
+		<result property="recamount" column="RECAMOUNT" javaType="BigDecimal" />
+		<result property="rectime" column="RECTIME" javaType="Date" />
+		<result property="batch" column="BATCH" javaType="String" />
+		<result property="disrecstatus" column="DISRECSTATUS" javaType="String" />
+		<result property="rereson" column="RERESON" javaType="String" />
+		<result property="eduptime" column="EDUPTIME" javaType="Date" />
+		<result property="discheckscoreid" column="DISCHECKSCOREID" javaType="String" />
+		<result property="differencereason" column="DIFFERENCEREASON" javaType="Object" />
+		<result property="remnantinventory" column="REMNANTINVENTORY" javaType="Long" />
+		<result property="returnstatus" column="RETURNSTATUS" javaType="Boolean" />
+		<result property="invoiceserialid" column="INVOICESERIALID" javaType="String" />
+		<result property="invoiceadddate" column="INVOICEADDDATE" javaType="Date" />
+		<result property="flag" column="FLAG" javaType="String" />
+		<result property="flaglog" column="FLAGLOG" javaType="String" />
+		<result property="flagtime" column="FLAGTIME" javaType="Date" />
+	</resultMap>
+
+	<sql id="full-columns">
+		t.DISRECID,
+		t.PURCHASEORDERDETAILID,
+		t.DISCOUNT,
+		t.DISAMOUNT,
+		t.DISTIME,
+		t.RECCOUNT,
+		t.RECAMOUNT,
+		t.RECTIME,
+		t.BATCH,
+		t.DISRECSTATUS,
+		t.RERESON,
+		t.EDUPTIME,
+		t.DISCHECKSCOREID,
+		t.DIFFERENCEREASON,
+		t.REMNANTINVENTORY,
+		t.RETURNSTATUS,
+		t.INVOICESERIALID,
+		t.INVOICEADDDATE,
+		t.FLAG,
+		t.FLAGLOG,
+		t.FLAGTIME
+	</sql>
+	
+	<sql id="common_where_if">
+			<if test="@com.OGNL@isNotEmpty(disrecid)">
+				AND t.DISRECID = #{disrecid}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(purchaseorderdetailid)">
+				AND t.PURCHASEORDERDETAILID = #{purchaseorderdetailid}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(discount)">
+				AND t.DISCOUNT = #{discount}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(disamount)">
+				AND t.DISAMOUNT = #{disamount}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(distime)">
+				AND t.DISTIME = #{distime}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(reccount)">
+				AND t.RECCOUNT = #{reccount}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(recamount)">
+				AND t.RECAMOUNT = #{recamount}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(rectime)">
+				AND t.RECTIME = #{rectime}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(batch)">
+				AND t.BATCH = #{batch}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(disrecstatus)">
+				AND t.DISRECSTATUS = #{disrecstatus}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(rereson)">
+				AND t.RERESON = #{rereson}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(eduptime)">
+				AND t.EDUPTIME = #{eduptime}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(discheckscoreid)">
+				AND t.DISCHECKSCOREID = #{discheckscoreid}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(differencereason)">
+				AND t.DIFFERENCEREASON = #{differencereason}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(remnantinventory)">
+				AND t.REMNANTINVENTORY = #{remnantinventory}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(returnstatus)">
+				AND t.RETURNSTATUS = #{returnstatus}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(invoiceserialid)">
+				AND t.INVOICESERIALID = #{invoiceserialid}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(invoiceadddate)">
+				AND t.INVOICEADDDATE = #{invoiceadddate}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(flag)">
+				AND t.FLAG = #{flag}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(flaglog)">
+				AND t.FLAGLOG = #{flaglog}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(flagtime)">
+				AND t.FLAGTIME = #{flagtime}
+			</if>
+	</sql>
+
+	<select id="getById" parameterType="java.lang.String"
+			resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM TRADE_DISREC t
+		WHERE t.DISRECID = #{value}
+	</select>
+
+	<select id="countByParams" parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM TRADE_DISREC t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM TRADE_DISREC t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.trade.model.TradeDisrec">
+		INSERT INTO TRADE_DISREC(
+		DISRECID ,
+		PURCHASEORDERDETAILID ,
+		DISCOUNT ,
+		DISAMOUNT ,
+		DISTIME ,
+		RECCOUNT ,
+		RECAMOUNT ,
+		RECTIME ,
+		BATCH ,
+		DISRECSTATUS ,
+		RERESON ,
+		EDUPTIME ,
+		DISCHECKSCOREID ,
+		DIFFERENCEREASON ,
+		REMNANTINVENTORY ,
+		RETURNSTATUS ,
+		INVOICESERIALID ,
+		INVOICEADDDATE ,
+		FLAG ,
+		FLAGLOG ,
+		FLAGTIME 
+		)
+		VALUES (
+		#{disrecid} ,
+		#{purchaseorderdetailid} ,
+		#{discount} ,
+		#{disamount} ,
+		#{distime} ,
+		#{reccount} ,
+		#{recamount} ,
+		#{rectime} ,
+		#{batch} ,
+		#{disrecstatus} ,
+		#{rereson} ,
+		#{eduptime} ,
+		#{discheckscoreid} ,
+		#{differencereason} ,
+		#{remnantinventory} ,
+		#{returnstatus} ,
+		#{invoiceserialid} ,
+		#{invoiceadddate} ,
+		#{flag} ,
+		#{flaglog} ,
+		#{flagtime} 
+		)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO TRADE_DISREC (
+		DISRECID ,
+		PURCHASEORDERDETAILID ,
+		DISCOUNT ,
+		DISAMOUNT ,
+		DISTIME ,
+		RECCOUNT ,
+		RECAMOUNT ,
+		RECTIME ,
+		BATCH ,
+		DISRECSTATUS ,
+		RERESON ,
+		EDUPTIME ,
+		DISCHECKSCOREID ,
+		DIFFERENCEREASON ,
+		REMNANTINVENTORY ,
+		RETURNSTATUS ,
+		INVOICESERIALID ,
+		INVOICEADDDATE ,
+		FLAG ,
+		FLAGLOG ,
+		FLAGTIME 
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.disrecid},
+			#{item.purchaseorderdetailid},
+			#{item.discount},
+			#{item.disamount},
+			#{item.distime},
+			#{item.reccount},
+			#{item.recamount},
+			#{item.rectime},
+			#{item.batch},
+			#{item.disrecstatus},
+			#{item.rereson},
+			#{item.eduptime},
+			#{item.discheckscoreid},
+			#{item.differencereason},
+			#{item.remnantinventory},
+			#{item.returnstatus},
+			#{item.invoiceserialid},
+			#{item.invoiceadddate},
+			#{item.flag},
+			#{item.flaglog},
+			#{item.flagtime}
+			)
+		</foreach>
+	</insert>
+
+	<update id="updateById" parameterType="com.trade.model.TradeDisrec">
+		UPDATE TRADE_DISREC
+		<set>
+			PURCHASEORDERDETAILID =
+			#{purchaseorderdetailid},
+			DISCOUNT =
+			#{discount},
+			DISAMOUNT =
+			#{disamount},
+			DISTIME =
+			#{distime},
+			RECCOUNT =
+			#{reccount},
+			RECAMOUNT =
+			#{recamount},
+			RECTIME =
+			#{rectime},
+			BATCH =
+			#{batch},
+			DISRECSTATUS =
+			#{disrecstatus},
+			RERESON =
+			#{rereson},
+			EDUPTIME =
+			#{eduptime},
+			DISCHECKSCOREID =
+			#{discheckscoreid},
+			DIFFERENCEREASON =
+			#{differencereason},
+			REMNANTINVENTORY =
+			#{remnantinventory},
+			RETURNSTATUS =
+			#{returnstatus},
+			INVOICESERIALID =
+			#{invoiceserialid},
+			INVOICEADDDATE =
+			#{invoiceadddate},
+			FLAG =
+			#{flag},
+			FLAGLOG =
+			#{flaglog},
+			FLAGTIME =
+			#{flagtime},
+		</set>
+		WHERE DISRECID =
+		#{disrecid}
+	</update>
+
+	<update id="updateBySelective" parameterType="com.trade.model.TradeDisrec">
+		UPDATE TRADE_DISREC
+		<set>
+			<if test="@com.OGNL@isNotEmpty(purchaseorderdetailid)">
+				PURCHASEORDERDETAILID =
+				#{purchaseorderdetailid},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(discount)">
+				DISCOUNT =
+				#{discount},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(disamount)">
+				DISAMOUNT =
+				#{disamount},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(distime)">
+				DISTIME =
+				#{distime},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(reccount)">
+				RECCOUNT =
+				#{reccount},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(recamount)">
+				RECAMOUNT =
+				#{recamount},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(rectime)">
+				RECTIME =
+				#{rectime},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(batch)">
+				BATCH =
+				#{batch},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(disrecstatus)">
+				DISRECSTATUS =
+				#{disrecstatus},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(rereson)">
+				RERESON =
+				#{rereson},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(eduptime)">
+				EDUPTIME =
+				#{eduptime},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(discheckscoreid)">
+				DISCHECKSCOREID =
+				#{discheckscoreid},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(differencereason)">
+				DIFFERENCEREASON =
+				#{differencereason},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(remnantinventory)">
+				REMNANTINVENTORY =
+				#{remnantinventory},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(returnstatus)">
+				RETURNSTATUS =
+				#{returnstatus},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(invoiceserialid)">
+				INVOICESERIALID =
+				#{invoiceserialid},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(invoiceadddate)">
+				INVOICEADDDATE =
+				#{invoiceadddate},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(flag)">
+				FLAG =
+				#{flag},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(flaglog)">
+				FLAGLOG =
+				#{flaglog},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(flagtime)">
+				FLAGTIME =
+				#{flagtime},
+			</if>
+		</set>
+		WHERE DISRECID =
+		#{disrecid}
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		TRADE_DISREC WHERE DISRECID = #{value}
+	</delete>
+
+	<insert id="addInsertDistributeByDistribute" parameterType="map">
+		INSERT INTO TRADE_DISREC
+		(DISRECID,
+		PURCHASEORDERDETAILID,
+		DISCOUNT,
+		DISAMOUNT,
+		DISTIME,
+		BATCH,
+		DISRECSTATUS,
+		EDUPTIME)
+		SELECT
+		b.distribute_id,
+		b.order_detail_id,
+		b.distribute_count,
+		b.distribute_count* a.PURCHASEPRICE,
+		to_date(dis_time,'yyyy-mm-dd hh24:mi:ss'),
+		NULL ,
+		'0',
+		sysdate
+		FROM TRADE_PURCHASEORDERDETAIL a INNER JOIN
+		<foreach collection="distributeList" item="distribute" open="(" separator=" union all " close=")">
+			select
+			#{distribute.distributeId} distribute_id,#{distribute.orderdetailid}
+			order_detail_id,#{distribute.discount} distribute_count,#{distribute.disTime} dis_time from dual
+		</foreach>
+		b on b.order_detail_id = a.PURCHASEORDERDETAILID
+		WHERE a.DETAILSTATUS in(0,9) and NOT EXISTS(select 1 from TRADE_DISREC where
+		PURCHASEORDERDETAILID=a.PURCHASEORDERDETAILID )
+	</insert>
+
+	<insert id="addInsertDistributeBatch" parameterType="map">
+		INSERT INTO TRADE_DISREC_PICI
+		(ID,
+		DISID,
+		BATCHNO,
+		DISCOUNT
+		)
+		select id,distributeId,batchcode,batchcount from
+		<foreach collection="distributeBatchList" item="item" open="(" separator=" union all " close=")">
+			select
+			sys_guid() id ,
+			#{item.distributeId} distributeId,
+			#{item.batchcode} batchcode,
+			#{item.batchcount} batchcount from dual
+		</foreach>
+		a
+	</insert>
+
+	<insert id="addInsertDistributeInvoice" parameterType="map">
+		INSERT INTO TRADE_INVOICE_DIS
+		(ID,
+		INVOICEID,
+		DISID
+		)
+		select id,invoicePrimaryId,distributeId from
+		<foreach collection="invoiceList" item="item" open="(" separator=" union all " close=")">
+			select
+			sys_guid() id,
+			#{item.invoiceid} invoicePrimaryId ,
+			#{item.disid} distributeId from dual
+		</foreach>
+		a
+	</insert>
+
+	<update id="updateOrderDetailByDistribute" parameterType="map">
+		UPDATE trade_purchaseorderdetail
+		SET
+		DETAILSTATUS = '4',
+		EDUPTIME=SYSDATE
+		WHERE PURCHASEORDERDETAILID IN(select order_detail_id from
+		<foreach collection="distributeList" item="distribute" open="(" separator=" union all " close=")">
+			select
+			#{distribute.orderdetailid}
+			order_detail_id from dual
+		</foreach>)
+	</update>
+
+	<select id="getVerificationInvoiceResultList"  parameterType="map" resultType="hashmap">
+		SELECT
+		t.distribute_id  distributeId,
+		t.invoice_primary_id invoicePrimaryKeyId,
+		t.invoice_id invoiceId,
+		t.invoice_code invoiceCode,
+		t.check_result checkResult,
+		t.dis_time disTime
+		FROM
+		bus_invoicecheck_result t
+		<where>
+			1=1
+			<if test="@com.OGNL@isNotEmpty(startTimeJk) and @com.OGNL@isNotEmpty(endTimeJk)">
+				AND t.add_time &gt;= #{startTimeJk}
+				AND t.add_time &lt; #{endTimeJk}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(companyIdPs)">
+				AND t.company_id_ps = #{companyIdPs}
+			</if>
+		</where>
+		ORDER BY  t.add_time asc
+	</select>
+
+	<select id="checkDistributeInvoiceDataByInterface"  parameterType="java.util.List" resultType="hashmap">
+		SELECT
+		a.company_Distribute_id companyDistributeId,
+		CASE WHEN b.detailstatus in(4,6) THEN 1 ELSE 0 END isCanDistribute,
+		CASE WHEN DR.Disrecid IS NULL THEN 0 ELSE 1 END isExists,
+		b.detailStatus
+		FROM
+		<foreach collection="detailList" item="item" open="(" separator=" union all " close=")">
+			SELECT
+			#{item.companyDistributeId} company_Distribute_id,
+			#{item.distributeId} distribute_Id
+			from dual
+		</foreach>a
+		LEFT JOIN TRADE_DISREC DR  ON a.distribute_Id = DR.DISRECID
+		LEFT JOIN trade_purchaseorderdetail b  ON  b .PURCHASEORDERDETAILID = DR.PURCHASEORDERDETAILID
+		LEFT JOIN TRADE_PURCHASEORDER c ON c.purchaseorderid=b.purchaseorderid
+	</select>
+
+	<delete id="deleteOldDistributeInvoice" parameterType="map">
+		delete trade_invoice_dis where disid
+		in
+		(select DISTINCT  distributeId from
+		<foreach collection="invoiceList" item="item" open="(" separator=" union all " close=")">
+			select
+			#{item.distributeId} distributeId from dual
+		</foreach>)
+	</delete>
+
+	<update id="updateDistributeInvoiceFlag" parameterType="map">
+		update trade_disrec a set a.flag=null where a.disrecid
+		in
+		(select DISTINCT  distributeId from
+		<foreach collection="invoiceList" item="item" open="(" separator=" union all " close=")">
+			select
+			#{item.distributeId} distributeId from dual
+		</foreach> aa)
+	</update>
+
+	<select id="getInvoiceCheckInfo" parameterType="map" resultType="hashmap">
+		select t.disrecid,
+		b.invoiceid invoicePrimaryKeyId,
+		c.invoiceid invoiceCode,
+		c.invoicecode invoiceId,
+		d.comid_ps,
+		b.flaglog,
+		to_char(p.submittime,'yyyy-mm-dd') submittime
+		from Trade_Disrec t
+		inner join temp_result b
+		on b.disrecid = t.disrecid
+		inner join trade_invoicenew c
+		on c.id = b.invoiceid
+		inner  join trade_purchaseorderdetail d on d.purchaseorderdetailid=t.purchaseorderdetailid
+		INNER JOIN TRADE_PURCHASEORDER p on d.PURCHASEORDERID=p.PURCHASEORDERID
+		inner join  base_datainterface_organizatio o on o.org_id=d.comid_ps
+		<where>
+			t.flag = 0 and o.org_type=2
+			<if test="@com.OGNL@isNotEmpty(startTime) and @com.OGNL@isNotEmpty(endTime)">
+				AND p.submittime &gt;=TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss')
+				AND p.submittime &lt;=TO_DATE (#{endTime},'yyyy-mm-dd hh24:mi:ss')
+			</if>
+			<if test="@com.OGNL@isNotEmpty(companyIdPs)">
+				AND d.comid_ps = #{companyIdPs}
+			</if>
+		</where>
+		ORDER BY p.submittime asc
+	</select>
+
+	<insert id="insertDistributeInvoice" parameterType="map">
+		INSERT INTO trade_invoice_dis
+		(
+		ID,
+		INVOICEID,
+		DISID
+		)
+		<foreach collection="invoiceList" item="item" index="index" separator=" union all ">
+			SELECT
+			sys_guid() ID,
+			#{item.invoicePrimaryId},
+			#{item.distributeId}
+			FROM DUAL
+		</foreach>
+	</insert>
+</mapper>

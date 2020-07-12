@@ -10,6 +10,9 @@ import com.trade.service.TradePurchaseorderdetailManager;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.Map;
+
 @Service
 public class TradePurchaseorderdetailManagerImpl extends GenericManagerImpl<TradePurchaseorderdetail, String> implements TradePurchaseorderdetailManager {
    @Autowired
@@ -32,5 +35,10 @@ public class TradePurchaseorderdetailManagerImpl extends GenericManagerImpl<Trad
         page.setRows(models);
         page.setRecords(models.getTotal());
         return page;
+    }
+
+    @Override
+    public List<Map<String, Object>> checkDistributeData(Map<String, Object> disDataList) {
+        return tradePurchaseorderdetailDao.checkDistributeData(disDataList);
     }
 }
