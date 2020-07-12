@@ -23,4 +23,14 @@ public class TradePurchaseorderdetailManagerImpl extends GenericManagerImpl<Trad
         page.setRows(models);
         return page;
     }
+
+    @Override
+    public Pagination getCancelPurchaseOrderForInterface(Pagination page) {
+        PageHelper pageHelper = new PageHelper();
+        pageHelper.startPage(page.getPage(), page.getCount(), page.getOrderby());
+        Page<TradePurchaseorderdetail> models = (Page<TradePurchaseorderdetail>) tradePurchaseorderdetailDao.getCancelPurchaseOrder(page.getConditions());
+        page.setRows(models);
+        page.setRecords(models.getTotal());
+        return page;
+    }
 }

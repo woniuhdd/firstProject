@@ -9,8 +9,15 @@ import com.enums.ResultCode;
 import com.model.DisBatch;
 import com.model.DistributeInfo;
 import com.model.ValidateResult;
+import com.github.pagehelper.Page;
 import com.sys.service.SysDatainterfaceOrganizationManager;
+import com.trade.model.BaseHospital;
+import com.trade.model.TradeCominfo;
+import com.trade.model.TradeDruginfo;
 import com.trade.model.TradePurchaseorderdetail;
+import com.trade.service.BaseHospitalManager;
+import com.trade.service.TradeCominfoManager;
+import com.trade.service.TradeDruginfoManager;
 import com.trade.service.TradePurchaseorderdetailManager;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateFormatUtils;
@@ -26,7 +33,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-@RestController(CompInterfaceController.ACTION_PATH)
+@RestController
 @RequestMapping(CompInterfaceController.ACTION_PATH)
 public class CompInterfaceController {
     protected static final String ACTION_PATH = "/compInterface";
@@ -40,6 +47,12 @@ public class CompInterfaceController {
     private SysDatainterfaceOrganizationManager sysDatainterfaceOrganizationManager;
     @Value("${page.size}")
     private String pageSize;
+    @Autowired
+    private BaseHospitalManager baseHospitalManager;
+    @Autowired
+    private TradeCominfoManager tradeCominfoManager;
+    @Autowired
+    private TradeDruginfoManager tradeDruginfoManager;
 
     /**
      * 内容摘要：获取采购订单数据
@@ -139,7 +152,7 @@ public class CompInterfaceController {
                     dataList.add(dataMap);
                 }
             }
-            resultJsonObj.put("returnCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
             resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
             resultJsonObj.put("dataList", dataList);
             resultJsonObj.put("currentPageNumber", page.getPage());// 按照数据返回正确的页码
@@ -148,7 +161,7 @@ public class CompInterfaceController {
             return resultJsonObj;
         } catch (Exception e) {
             log.error("Failed to getOrder", e);
-            resultJsonObj.put("returnCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
             resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage());
             return resultJsonObj;
         }
@@ -415,7 +428,90 @@ public class CompInterfaceController {
     @RequestMapping(value = "/purchaseOrder/getCancelOrder", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getCancelPurchaseOrder(String token, String startTime, String endTime, String currentPageNumber){
-        return null;
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(startTime)
+                || StringUtils.isEmpty(endTime) || StringUtils.isEmpty(currentPageNumber) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            dataList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> map = validateToken.validateToken(token);
+        Integer resultCode = (Integer) map.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", map.get("resultCode"));
+            resultMap.put("errorMsg", map.get("resultMsg"));
+            dataList.add(resultMap);
+        }
+
+        //验证数据有效性
+        //1.页数是否为正整数
+        if(!ValidateUtil.checkCount(currentPageNumber)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_INVALID.getCode());
+            dataList.add(resultMap);
+        }
+        //2.时间格式是否正确
+        if (!ValidateUtil.checkDate(startTime) || !ValidateUtil.checkDate(endTime) ){
+            resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            dataList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (dataList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+        try {
+            Pagination page = new Pagination();
+            Map<String, Object> paramsMap = new HashMap<String, Object>();
+            paramsMap.put("startTime", startTime);
+            paramsMap.put("endTime", endTime);
+            paramsMap.put("companyIdPs", map.get("orgId").toString());
+            page.setConditions(paramsMap);
+            page.setPage(Integer.parseInt(currentPageNumber));
+            page.setCount(Integer.parseInt(pageSize));// 每页查询数据量
+            page.setSord("ASC");// 排序方向
+            page.setOrderby();
+            //数据库交换
+            tradePurchaseorderdetailManager.getCancelPurchaseOrderForInterface(page);
+            Page<TradePurchaseorderdetail> detailsPage = (Page<TradePurchaseorderdetail>) page.getRows();
+            int totalPages = detailsPage.getPages();
+            int cur = detailsPage.getPageNum();
+            long total = detailsPage.getTotal();// 总记录数
+            List<TradePurchaseorderdetail> details = detailsPage;
+            if (details != null && details.size() > 0) {
+                for (TradePurchaseorderdetail detail : details) {
+                    JSONObject retMap = new JSONObject(16);
+                    retMap.put("orderId", detail.getPurchaseorderid());
+                    retMap.put("orderCode", detail.getPurchaseordercode());
+                    retMap.put("hospitalId", detail.getHosid());
+                    retMap.put("cancelTime", detail.getEduptime()==null?"":DateFormatUtils.format(detail.getEduptime(),"yyyy-MM-dd"));
+                    dataList.add(retMap);
+                }
+            }
+            resultJsonObj.put("returnCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+            resultJsonObj.put("currentPageNumber", cur);// 按照数据返回正确的页码
+            resultJsonObj.put("totalPageCount", totalPages);
+            resultJsonObj.put("totalRecordCount", total);
+            resultJsonObj.put("dataList", dataList);
+        } catch (Exception e) {
+            log.error("Failed to confirmOrder", e);
+            resultJsonObj.put("returnCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+        }
+
+        return resultJsonObj;
     }
 
     /**
@@ -442,7 +538,127 @@ public class CompInterfaceController {
     @RequestMapping(value = "/procurecatalog/getProcurecatalog", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getProcurecatalog(String token, String month, String procurecatalogIds, String currentPageNumber){
-        return null;
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(currentPageNumber) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            dataList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> map = validateToken.validateToken(token);
+        Integer resultCode = (Integer) map.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", map.get("resultCode"));
+            resultMap.put("errorMsg", map.get("resultMsg"));
+            dataList.add(resultMap);
+        }
+
+        //验证数据有效性
+        //1.页数是否为正整数
+        if(!ValidateUtil.checkCount(currentPageNumber)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_INVALID.getMessage());
+            dataList.add(resultMap);
+        }
+        //2.时间格式是否正确
+        if (month!=null&&!ValidateUtil.match("^(19|20\\d{2})-(0[1-9]|1[0-2])$",month) ){
+            resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+            dataList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (dataList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+        try {
+            Map<String, Object> params = new HashMap<>(16);
+            Pagination page = new Pagination();
+            if (procurecatalogIds!=null&&!"".equals(procurecatalogIds)) {
+                List<String> procurecatalogId = JSONObject.parseObject(procurecatalogIds).getObject("list",List.class);
+                params.put("procurecatalogId", procurecatalogId);
+            }
+            if (month!=null&&!"".equals(month)) {
+                params.putAll(getTimes(month));
+            }
+            page.setConditions(params);
+            //4 校验输入参数是否满足配置要求
+            page.setPage(Integer.parseInt(currentPageNumber));
+            // 每页查询数据量
+            page.setCount(Integer.parseInt(pageSize));
+            page.setOrderby();
+            //5.数据库交互
+            tradeDruginfoManager.getBaseGoodsList(page);
+            Page<TradeDruginfo> detailsPage = (Page<TradeDruginfo>) page.getRows();
+            // 总页数
+            int totalPages = detailsPage.getPages();
+            //  当前页
+            int cur = detailsPage.getPageNum();
+            //  总记录数
+            long total = detailsPage.getTotal();
+            List<TradeDruginfo> baseGoodsList = detailsPage;
+            if (baseGoodsList.size() > 0) {
+                for (TradeDruginfo tradeDruginfo : baseGoodsList) {
+                    Map<String, Object> retMap = new HashMap<>(16);
+                    retMap.put("procurecatalogId", tradeDruginfo.getDrugid());
+                    retMap.put("goodsId", tradeDruginfo.getProductid());
+                    retMap.put("productName", tradeDruginfo.getDrugname());
+                    retMap.put("goodsName", tradeDruginfo.getDruggoodsname());
+                    retMap.put("medicinemodel", tradeDruginfo.getDrugform());
+                    retMap.put("outlook", tradeDruginfo.getDrugspec());
+                    retMap.put("factor", tradeDruginfo.getDrugfactor());
+                    retMap.put("materialName", tradeDruginfo.getDrugmaterial());
+                    retMap.put("unit", tradeDruginfo.getPack());
+                    retMap.put("companyIdSc", tradeDruginfo.getCompanyidSc());
+                    retMap.put("companyNameSc", tradeDruginfo.getCompanynameSc());
+                    retMap.put("companyIdTb", tradeDruginfo.getCompanyidTb());
+                    retMap.put("companyNameTb", tradeDruginfo.getCompanynameTb());
+                    retMap.put("purchaseType", tradeDruginfo.getCatalogtype());
+                    retMap.put("sourceName", tradeDruginfo.getDrugsource());
+                    retMap.put("middlePack", tradeDruginfo.getMiddlepack());
+                    retMap.put("maxPack", tradeDruginfo.getBigpack());
+                    retMap.put("bidPrice", tradeDruginfo.getPrice());
+                    retMap.put("comPrice", tradeDruginfo.getComprice());
+                    retMap.put("isUrbmi", tradeDruginfo.getIsurbmi());
+                    retMap.put("medicalinsuranceType", tradeDruginfo.getMedicalinsurancetype());
+                    retMap.put("isBaseDrug", tradeDruginfo.getIsBasicDrug());
+                    retMap.put("isUsing", tradeDruginfo.getIsusing());
+                    retMap.put("ispilot", tradeDruginfo.getIspilot());
+                    retMap.put("id", tradeDruginfo.getId());
+                    retMap.put("addTime", tradeDruginfo.getAddtime()== null ? "" : DateFormatUtils.format(tradeDruginfo.getAddtime(), "yyyy-MM-dd"));
+                    retMap.put("lastUpdateTime", tradeDruginfo.getLastUpdateTime()== null ? "" : DateFormatUtils.format(tradeDruginfo.getLastUpdateTime(), "yyyy-MM-dd"));
+                    dataList.add(retMap);
+                }
+                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getCode());
+            } else {
+                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
+            }
+            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
+            //总页数
+            resultJsonObj.put("totalPageCount", totalPages);
+            //当前页码
+            resultJsonObj.put("currentPageNumber", cur);
+            //总行数
+            resultJsonObj.put("totalRecordCount", total);
+            resultJsonObj.put("dataList", dataList);
+        } catch (Exception e) {
+            log.error("Failed to getCompany", e);
+            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+        return resultJsonObj;
     }
 
     /**
@@ -457,7 +673,118 @@ public class CompInterfaceController {
     @RequestMapping(value = "/company/getCompany", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getCompany(String token, String companyIds, String month, String currentPageNumber){
-        return null;
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(currentPageNumber) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            dataList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> map = validateToken.validateToken(token);
+        Integer resultCode = (Integer) map.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", map.get("resultCode"));
+            resultMap.put("errorMsg", map.get("resultMsg"));
+            dataList.add(resultMap);
+        }
+
+        //验证数据有效性
+        //1.页数是否为正整数
+        if(!ValidateUtil.checkCount(currentPageNumber)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_INVALID.getMessage());
+            dataList.add(resultMap);
+        }
+        //2.时间格式是否正确
+        if (month!=null&&!ValidateUtil.match("^(19|20\\d{2})-(0[1-9]|1[0-2])$",month) ){
+            resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+            dataList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (dataList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+        try {
+            Map<String, Object> params = new HashMap<>(16);
+            Pagination page = new Pagination();
+            if (companyIds!=null&&!"".equals(companyIds)) {
+                List<String> companyid = JSONObject.parseObject(companyIds).getObject("list",List.class);
+                params.put("companyid", companyid);
+            }
+            if (month!=null&&!"".equals(month)) {
+                params.putAll(getTimes(month));
+            }
+            page.setConditions(params);
+            //3 校验输入参数是否满足配置要求
+            page.setPage(Integer.parseInt(currentPageNumber));
+            // 每页查询数据量
+            page.setCount(Integer.parseInt(pageSize));
+            //  排序字段
+            page.setSidx("lastUpdateTime,companyid");
+            // 排序方向
+            page.setSord("ASC");
+            page.setOrderby();
+            //4.数据库交互
+            tradeCominfoManager.getBaseCompanyList(page);
+            Page<TradeCominfo> detailsPage = (Page<TradeCominfo>) page.getRows();
+            // 总页数
+            int totalPages = detailsPage.getPages();
+            //  当前页
+            int cur = detailsPage.getPageNum();
+            //  总记录数
+            long total = detailsPage.getTotal();
+            List<TradeCominfo> baseCompanyList = detailsPage;
+            if (baseCompanyList.size() > 0) {
+                for (TradeCominfo tradeCominfo : baseCompanyList) {
+                    Map<String, Object> retMap = new HashMap<>(16);
+                    retMap.put("companyId", tradeCominfo.getCompanyid());
+                    retMap.put("id", tradeCominfo.getId());
+                    retMap.put("companyType", tradeCominfo.getCompanytype());
+                    retMap.put("companyName", tradeCominfo.getCompanyname());
+                    retMap.put("address", tradeCominfo.getAddress());
+                    retMap.put("companyContactTel", tradeCominfo.getCompanytel());
+                    //企业传真号码
+                    retMap.put("companyContactFax", tradeCominfo.getFax());
+                    //邮编
+                    retMap.put("zipCode", tradeCominfo.getZipcode());
+                    //邮箱
+                    retMap.put("email", tradeCominfo.getEmail());
+                    retMap.put("addTime", tradeCominfo.getAddtime()== null ? "" : DateFormatUtils.format(tradeCominfo.getAddtime(), "yyyy-MM-dd"));
+                    retMap.put("lastUpdateTime", tradeCominfo.getLastUpdateTime()== null ? "" : DateFormatUtils.format(tradeCominfo.getLastUpdateTime(), "yyyy-MM-dd"));
+                    dataList.add(retMap);
+                }
+                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getCode());
+            } else {
+                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
+            }
+            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
+            //总页数
+            resultJsonObj.put("totalPageCount", totalPages);
+            //当前页码
+            resultJsonObj.put("currentPageNumber", cur);
+            //总行数
+            resultJsonObj.put("totalRecordCount", total);
+            resultJsonObj.put("dataList", dataList);
+        } catch (Exception e) {
+            log.error("Failed to getCompany", e);
+            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+        return resultJsonObj;
     }
 
     /**
@@ -472,6 +799,125 @@ public class CompInterfaceController {
     @RequestMapping(value = "/hospital/getHospital", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getHospital(String token, String hospitalIds, String month, String currentPageNumber){
-        return null;
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(currentPageNumber) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            dataList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> map = validateToken.validateToken(token);
+        Integer resultCode = (Integer) map.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", map.get("resultCode"));
+            resultMap.put("errorMsg", map.get("resultMsg"));
+            dataList.add(resultMap);
+        }
+
+        //验证数据有效性
+        //1.页数是否为正整数
+        if(!ValidateUtil.checkCount(currentPageNumber)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_INVALID.getMessage());
+            dataList.add(resultMap);
+        }
+        //2.时间格式是否正确
+        if (month!=null&&!ValidateUtil.match("^(19|20\\d{2})-(0[1-9]|1[0-2])$",month) ){
+            resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+            dataList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (dataList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("dataList", dataList);
+            return resultJsonObj;
+        }
+
+        try {
+            Pagination page = new Pagination();
+            Map<String,Object> params=new HashMap<>();
+            if (hospitalIds!=null&&!"".equals(hospitalIds)) {
+                List<String> hosIds = JSONObject.parseObject(hospitalIds).getObject("list",List.class);
+                params.put("hospitalId", hosIds);
+            }
+            if (month!=null&&!"".equals(month)) {
+                params.putAll(getTimes(month));
+            }
+            page.setConditions(params);
+            //4 校验输入参数是否满足配置要求
+            page.setPage(Integer.parseInt(currentPageNumber));
+            // 每页查询数据量
+            page.setCount(Integer.parseInt(pageSize));
+            //  排序字段
+            page.setSidx("lastUpdateTime,hospitalcode");
+            // 排序方向
+            page.setSord("ASC");
+            page.setOrderby();
+            //5.数据库交互
+            baseHospitalManager.getBaseHospitalListInfo(page);
+            Page<BaseHospital> detailsPage = (Page<BaseHospital>) page.getRows();
+            // 总页数
+            int totalPages = detailsPage.getPages();
+            //  当前页
+            int cur = detailsPage.getPageNum();
+            //  总记录数
+            long total = detailsPage.getTotal();
+            List<BaseHospital> baseHospitalList = detailsPage;
+            if (baseHospitalList.size() > 0) {
+                for (BaseHospital baseHospital : baseHospitalList) {
+                    Map<String, Object> retMap = new HashMap<>(16);
+                    retMap.put("hospitalId", baseHospital.getId());
+                    retMap.put("hospitalCode", baseHospital.getHospitalcode());
+                    retMap.put("hospitalName", baseHospital.getHospitalname());
+                    retMap.put("hospitalType", baseHospital.getHospitaltype());
+                    retMap.put("areaId", baseHospital.getAreaid());
+                    retMap.put("areaName", baseHospital.getAreaName());
+                    retMap.put("isUsing", baseHospital.getIsusing());
+                    retMap.put("addTime", baseHospital.getAddtime() == null ? "" : DateFormatUtils.format(baseHospital.getAddtime(), "yyyy-MM-dd"));
+                    retMap.put("lastUpdateTime", baseHospital.getLastUpdateTime()== null ? "" : DateFormatUtils.format(baseHospital.getLastUpdateTime(), "yyyy-MM-dd"));
+                    dataList.add(retMap);
+                }
+                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+            } else {
+                resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
+            }
+            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
+            //总页数
+            resultJsonObj.put("totalPageCount", totalPages);
+            //当前页码
+            resultJsonObj.put("currentPageNumber", cur);
+            //总行数
+            resultJsonObj.put("totalRecordCount", total);
+            resultJsonObj.put("hospInfList", dataList);
+        } catch (Exception e) {
+            log.error("Failed to getHospital", e);
+            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("returnMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            resultJsonObj.put("totalPageCount", "");
+            resultJsonObj.put("hospInfList", dataList);
+            return resultJsonObj;
+        }
+        return resultJsonObj;
+    }
+
+    public Map<String, Object> getTimes(String date) {
+        Map<String, Object> params = new HashMap<>();
+        String[] dates = date.split("-");
+        Calendar cal = Calendar.getInstance();
+        cal.set(Calendar.YEAR, Integer.valueOf(dates[0]));
+        cal.set(Calendar.MONTH, Integer.valueOf(dates[1]) - 1);
+        int lastDay = cal.getActualMaximum(Calendar.DAY_OF_MONTH);
+        params.put("startTime", date + "-01 00:00:00");
+        params.put("endTime", date + "-" + lastDay + " 23:59:59");
+        return params;
     }
 }

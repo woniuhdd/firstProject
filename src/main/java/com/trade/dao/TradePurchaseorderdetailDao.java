@@ -11,4 +11,6 @@ import java.util.Map;
 public interface TradePurchaseorderdetailDao extends GenericDao<TradePurchaseorderdetail, String> {
 
     List<TradePurchaseorderdetail> queryAllOrderDetailRecentForInterface(Map<String, Object> map);
+
+    List<TradePurchaseorderdetail>  getCancelPurchaseOrder(Map<String, Object> map);
 }
