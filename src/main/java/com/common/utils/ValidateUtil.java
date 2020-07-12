@@ -1,7 +1,11 @@
 package com.common.utils;
 
+import com.alibaba.fastjson.JSONObject;
+import com.enums.ResultCode;
+import org.apache.commons.lang.StringUtils;
+
 import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.util.*;
 import java.util.regex.Matcher;
 
 public class ValidateUtil {
@@ -29,9 +33,10 @@ public class ValidateUtil {
     }
 
 
-    private static boolean match(String regex, String str) {
+    public static boolean match(String regex, String str) {
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(regex);
         Matcher matcher = pattern.matcher(str);
         return matcher.matches();
     }
+
 }

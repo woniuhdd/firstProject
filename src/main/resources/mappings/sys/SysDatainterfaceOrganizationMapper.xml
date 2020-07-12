@@ -319,8 +319,7 @@
 		FROM SYS_DATAINTERFACE_ORGANIZATION t
 		<where>
 			<if test="@com.OGNL@isNotEmpty(orgId)">
-				AND	t.ORG_ID = #{orgId}
-				OR t.FATHER_ID = #{orgId}
+				AND	 (t.ORG_ID = #{orgId} OR t.FATHER_ID = #{orgId})
 			</if>
 		</where>
 	</select>
