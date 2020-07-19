@@ -30,8 +30,8 @@ public class ValidateDistributeInfo {
 
             JSONArray batchList = (JSONArray) distributeInfomap.get("list");
             if (batchList == null || batchList.size() == 0) {
-                resultJsonObj.put("returnCode", ResultCode.PARAM_NOT_COMPLETE.getCode());
-                resultJsonObj.put("returnMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.PARAM_NOT_COMPLETE.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage());
                 validateResult.setJsonObject(resultJsonObj);
                 validateResult.setSuccess(false);
                 return validateResult;
@@ -39,8 +39,8 @@ public class ValidateDistributeInfo {
 
             List<DistributeInfo> distributeInfoList = JSONObject.parseArray(JSONObject.parseObject(distributeInfo).getString("list"), DistributeInfo.class);
             if (distributeInfoList == null || distributeInfoList.size() == 0) {
-                resultJsonObj.put("returnCode", ResultCode.PARAM_NOT_COMPLETE.getCode());
-                resultJsonObj.put("returnMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.PARAM_NOT_COMPLETE.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage());
                 validateResult.setJsonObject(resultJsonObj);
                 validateResult.setSuccess(false);
                 return validateResult;
@@ -131,8 +131,8 @@ public class ValidateDistributeInfo {
             }
             //如果错误集合数量大于0 ，则提示验证失败
             if (errorList.size() > 0) {
-                resultJsonObj.put("returnCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
-                resultJsonObj.put("returnMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
                 resultJsonObj.put("errorList", errorList);
                 validateResult.setSuccess(false);
                 validateResult.setJsonObject(resultJsonObj);
@@ -146,8 +146,8 @@ public class ValidateDistributeInfo {
             }
 
         }catch (Exception e){
-            resultJsonObj.put("returnCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
             validateResult.setJsonObject(resultJsonObj);
             validateResult.setSuccess(false);
             return validateResult;
@@ -180,15 +180,15 @@ public class ValidateDistributeInfo {
         }
         //如果数量与原始记录一致，则无重复提交
         if (listWithoutDup.size() == primaryList.size()) {
-            resultJsonObj.put("returnCode", ResultCode.SUCCESS.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.SUCCESS.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
             validateResult.setJsonObject(resultJsonObj);
             validateResult.setSuccess(false);
             return validateResult;
         }else {
             //如果数量与原始记录不一致，则是有重复提交
-            resultJsonObj.put("returnCode", ResultCode.PARAM_IS_INVALID.getCode());
-            resultJsonObj.put("returnMsg", ResultCode.PARAM_IS_INVALID.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.PARAM_IS_INVALID.getMessage());
             validateResult.setJsonObject(resultJsonObj);
             validateResult.setSuccess(false);
             return validateResult;

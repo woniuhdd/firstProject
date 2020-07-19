@@ -1,6 +1,9 @@
 package com.trade.service.impl;
 
 import com.common.service.impl.GenericManagerImpl;
+import com.common.utils.Pagination;
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.trade.dao.TradeDisrecDao;
 import com.trade.model.TradeDisrec;
 import com.trade.model.TradeInvoiceDis;
@@ -29,6 +32,32 @@ public class TradeDisrecManagerImpl extends GenericManagerImpl<TradeDisrec, Stri
                 tradeDisrecDao.addInsertDistributeInvoice(map);
             }
             tradeDisrecDao.updateOrderDetailByDistribute(map);
+        }
+        return count;
+    }
+
+    @Override
+    public Pagination getVerificationInvoiceResultList(Pagination page) {
+        PageHelper pageHelper = new PageHelper();
+        pageHelper.startPage(page.getPage(), page.getCount(), page.getOrderby());
+        Page<Map<String,Object>> models = (Page<Map<String,Object>>) tradeDisrecDao.getInvoiceCheckInfo(page.getConditions());
+        page.setRows(models);
+        page.setRecords(models.getTotal());
+        return page;
+    }
+
+    @Override
+    public List<Map<String, Object>> checkDistributeInvoiceDataByInterface(Map<String, Object> map) {
+        return tradeDisrecDao.checkDistributeInvoiceDataByInterface(map);
+    }
+
+    @Override
+    public int addInvoiceDistributeData(Map<String, Object> map) {
+
+        int count = tradeDisrecDao.deleteOldDistributeInvoice(map);
+        if (count > 0) {
+            tradeDisrecDao.updateDistributeInvoiceFlag(map);
+            tradeDisrecDao.insertDistributeInvoice(map);
         }
         return count;
     }

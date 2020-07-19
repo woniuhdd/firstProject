@@ -1,0 +1,301 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trade.dao.TradeGoodslistDao">
+	<resultMap type="com.trade.model.TradeGoodslist" id="BaseResultMap">
+		<result property="id" column="ID" javaType="String" />
+		<result property="batchid" column="BATCHID" javaType="String" />
+		<result property="drugvaliditydate" column="DRUGVALIDITYDATE" javaType="BigDecimal" />
+		<result property="count" column="COUNT" javaType="Integer" />
+		<result property="drugid" column="DRUGID" javaType="String" />
+		<result property="invoiceid" column="INVOICEID" javaType="String" />
+		<result property="adduserid" column="ADDUSERID" javaType="String" />
+		<result property="addtime" column="ADDTIME" javaType="Date" />
+		<result property="changeperson" column="CHANGEPERSON" javaType="String" />
+		<result property="changereason" column="CHANGEREASON" javaType="String" />
+		<result property="changetime" column="CHANGETIME" javaType="Date" />
+		<result property="drugvaliditydate1" column="DRUGVALIDITYDATE1" javaType="Date" />
+	</resultMap>
+
+	<sql id="full-columns">
+		t.ID,
+		t.BATCHID,
+		t.DRUGVALIDITYDATE,
+		t.COUNT,
+		t.DRUGID,
+		t.INVOICEID,
+		t.ADDUSERID,
+		t.ADDTIME,
+		t.CHANGEPERSON,
+		t.CHANGEREASON,
+		t.CHANGETIME,
+		t.DRUGVALIDITYDATE1
+	</sql>
+	
+	<sql id="common_where_if">
+			<if test="@OGNL@isNotEmpty(id)">
+				AND t.ID = #{id}
+			</if>
+			<if test="@OGNL@isNotEmpty(batchid)">
+				AND t.BATCHID = #{batchid}
+			</if>
+			<if test="@OGNL@isNotEmpty(drugvaliditydate)">
+				AND t.DRUGVALIDITYDATE = #{drugvaliditydate}
+			</if>
+			<if test="@OGNL@isNotEmpty(count)">
+				AND t.COUNT = #{count}
+			</if>
+			<if test="@OGNL@isNotEmpty(drugid)">
+				AND t.DRUGID = #{drugid}
+			</if>
+			<if test="@OGNL@isNotEmpty(invoiceid)">
+				AND t.INVOICEID = #{invoiceid}
+			</if>
+			<if test="@OGNL@isNotEmpty(adduserid)">
+				AND t.ADDUSERID = #{adduserid}
+			</if>
+			<if test="@OGNL@isNotEmpty(addtime)">
+				AND t.ADDTIME = #{addtime}
+			</if>
+			<if test="@OGNL@isNotEmpty(changeperson)">
+				AND t.CHANGEPERSON = #{changeperson}
+			</if>
+			<if test="@OGNL@isNotEmpty(changereason)">
+				AND t.CHANGEREASON = #{changereason}
+			</if>
+			<if test="@OGNL@isNotEmpty(changetime)">
+				AND t.CHANGETIME = #{changetime}
+			</if>
+			<if test="@OGNL@isNotEmpty(drugvaliditydate1)">
+				AND t.DRUGVALIDITYDATE1 = #{drugvaliditydate1}
+			</if>
+	</sql>
+
+	<select id="getById" parameterType="java.lang.String"
+			resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM TRADE_GOODSLIST t
+		WHERE t.ID = #{value}
+	</select>
+
+	<select id="countByParams" parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM TRADE_GOODSLIST t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM TRADE_GOODSLIST t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.trade.model.TradeGoodslist">
+		INSERT INTO TRADE_GOODSLIST(
+		ID ,
+		BATCHID ,
+		DRUGVALIDITYDATE ,
+		COUNT ,
+		DRUGID ,
+		INVOICEID ,
+		ADDUSERID ,
+		ADDTIME ,
+		CHANGEPERSON ,
+		CHANGEREASON ,
+		CHANGETIME ,
+		DRUGVALIDITYDATE1 
+		)
+		VALUES (
+		#{id} ,
+		#{batchid} ,
+		#{drugvaliditydate} ,
+		#{count} ,
+		#{drugid} ,
+		#{invoiceid} ,
+		#{adduserid} ,
+		#{addtime} ,
+		#{changeperson} ,
+		#{changereason} ,
+		#{changetime} ,
+		#{drugvaliditydate1} 
+		)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO TRADE_GOODSLIST (
+		ID ,
+		BATCHID ,
+		DRUGVALIDITYDATE ,
+		"COUNT" ,
+		DRUGID ,
+		INVOICEID ,
+		ADDUSERID ,
+		ADDTIME ,
+		CHANGEPERSON ,
+		CHANGEREASON ,
+		CHANGETIME ,
+		DRUGVALIDITYDATE1 
+		)
+		<foreach collection="list" item="item" index="index"
+				 separator="union all">
+			SELECT
+			#{item.id} id,
+			#{item.batchid} batchid,
+			#{item.drugvaliditydate} drugvaliditydate,
+			#{item.count} "count",
+			#{item.drugid} drugid,
+			#{item.invoiceid} invoiceid,
+			#{item.adduserid} adduserid,
+			#{item.addtime} addtime,
+			#{item.changeperson} changeperson,
+			#{item.changereason} changereason,
+			#{item.changetime} changetime,
+			#{item.drugvaliditydate1} drugvaliditydate1
+			FROM DUAL
+		</foreach>
+	</insert>
+
+	<update id="updateById" parameterType="com.trade.model.TradeGoodslist">
+		UPDATE TRADE_GOODSLIST
+		<set>
+			BATCHID =
+			#{batchid},
+			DRUGVALIDITYDATE =
+			#{drugvaliditydate},
+			COUNT =
+			#{count},
+			DRUGID =
+			#{drugid},
+			INVOICEID =
+			#{invoiceid},
+			ADDUSERID =
+			#{adduserid},
+			ADDTIME =
+			#{addtime},
+			CHANGEPERSON =
+			#{changeperson},
+			CHANGEREASON =
+			#{changereason},
+			CHANGETIME =
+			#{changetime},
+			DRUGVALIDITYDATE1 =
+			#{drugvaliditydate1},
+		</set>
+		WHERE ID =
+		#{id}
+	</update>
+
+	<update id="updateBySelective" parameterType="com.trade.model.TradeGoodslist">
+		UPDATE TRADE_GOODSLIST
+		<set>
+			<if test="@OGNL@isNotEmpty(batchid)">
+				BATCHID =
+				#{batchid},
+			</if>
+			<if test="@OGNL@isNotEmpty(drugvaliditydate)">
+				DRUGVALIDITYDATE =
+				#{drugvaliditydate},
+			</if>
+			<if test="@OGNL@isNotEmpty(count)">
+				COUNT =
+				#{count},
+			</if>
+			<if test="@OGNL@isNotEmpty(drugid)">
+				DRUGID =
+				#{drugid},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoiceid)">
+				INVOICEID =
+				#{invoiceid},
+			</if>
+			<if test="@OGNL@isNotEmpty(adduserid)">
+				ADDUSERID =
+				#{adduserid},
+			</if>
+			<if test="@OGNL@isNotEmpty(addtime)">
+				ADDTIME =
+				#{addtime},
+			</if>
+			<if test="@OGNL@isNotEmpty(changeperson)">
+				CHANGEPERSON =
+				#{changeperson},
+			</if>
+			<if test="@OGNL@isNotEmpty(changereason)">
+				CHANGEREASON =
+				#{changereason},
+			</if>
+			<if test="@OGNL@isNotEmpty(changetime)">
+				CHANGETIME =
+				#{changetime},
+			</if>
+			<if test="@OGNL@isNotEmpty(drugvaliditydate1)">
+				DRUGVALIDITYDATE1 =
+				#{drugvaliditydate1},
+			</if>
+		</set>
+		WHERE ID =
+		#{id}
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		TRADE_GOODSLIST WHERE ID = #{value}
+	</delete>
+
+	<select id="checkSaleIsExistsByInterface" parameterType="java.util.List" resultType="hashmap">
+		SELECT
+		a.COMPANYPRIMARYKEY,
+		CASE WHEN b.id IS NULL THEN 0 ELSE 1 END ISEXISTS
+		FROM
+		<foreach collection="list" item="item" open="(" separator=" union all " close=")">
+			SELECT #{item.companyPrimaryKey} companyPrimaryKey,
+			#{item.invoicePrimaryID} invoicePrimaryKeyId,
+			#{item.goodsID} goodsID,
+			#{item.batchCode} batchCode  from dual
+		</foreach> a
+		left join trade_invoicenew   c on c.ID = a.invoicePrimaryKeyId
+		left JOIN TRADE_DRUGINFO d on d.ID=a.goodsID
+		left JOIN trade_goodslist b ON b.invoiceid = c.id and b.drugid =d.drugid
+		and b.batchid = a.batchCode
+	</select>
+
+	<insert id="addSaleInfo" parameterType="java.util.List">
+		INSERT INTO TRADE_GOODSLIST (
+		ID ,
+		BATCHID ,
+		DRUGVALIDITYDATE1 ,
+		"COUNT" ,
+		DRUGID ,
+		INVOICEID ,
+		ADDUSERID ,
+		ADDTIME
+		)
+		select A.id ,
+		A.batchid ,
+		A.drugvaliditydate1 ,
+		A."count" ,
+		T.drugid ,
+		A.invoiceid ,
+		A.adduserid ,
+		A.addtime
+		FROM TRADE_DRUGINFO T INNER JOIN (
+		<foreach collection="list" item="item" index="index"
+				 separator="union all">
+			SELECT
+			#{item.id} id,
+			#{item.batchid} batchid,
+			#{item.drugvaliditydate1} drugvaliditydate1,
+			#{item.count} "count",
+			#{item.drugid} drugid,
+			#{item.invoiceid} invoiceid,
+			#{item.adduserid} adduserid,
+			#{item.addtime} addtime
+			FROM DUAL
+		</foreach>)A ON A.drugid=T.id
+	</insert>
+</mapper>

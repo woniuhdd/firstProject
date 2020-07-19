@@ -15,6 +15,8 @@ public class DistributeInfo {
     private  String middleInviceID;
     private String secondInviceID;
 
+    private String invoicePrimaryId;
+
     public String getCompanyDistributeId() {
         return companyDistributeId;
     }
@@ -85,5 +87,13 @@ public class DistributeInfo {
 
     public void setSecondInviceID(String secondInviceID) {
         this.secondInviceID = secondInviceID;
+    }
+
+    public String getInvoicePrimaryId() {
+        return invoicePrimaryId;
+    }
+
+    public void setInvoicePrimaryId(String invoicePrimaryId) {
+        this.invoicePrimaryId = invoicePrimaryId;
     }
 }

@@ -1,16 +1,17 @@
 package com.controller;
 
+import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.common.controller.ValidateDistributeInfo;
 import com.common.controller.ValidateToken;
 import com.common.utils.Pagination;
 import com.common.utils.ToolUtils;
+import com.common.utils.ValidateInterface;
 import com.common.utils.ValidateUtil;
+import com.enums.OrderDetailStatus;
 import com.enums.ResultCode;
 import com.github.pagehelper.Page;
-import com.model.DisBatch;
-import com.model.DistributeInfo;
-import com.model.ValidateResult;
+import com.model.*;
 import com.sys.service.SysDatainterfaceOrganizationManager;
 import com.trade.model.*;
 import com.trade.service.*;
@@ -42,6 +43,12 @@ public class CompInterfaceController {
     private SysDatainterfaceOrganizationManager sysDatainterfaceOrganizationManager;
     @Autowired
     private TradeDisrecManager tradeDisrecManager;
+    @Autowired
+    private TradeInvoicenewManager tradeInvoicenewManager;
+    @Autowired
+    private BaseImgannexManager baseImgannexManager;
+    @Autowired
+    private TradeGoodslistManager tradeGoodslistManager;
     @Autowired
     private BaseHospitalManager baseHospitalManager;
     @Autowired
@@ -401,7 +408,89 @@ public class CompInterfaceController {
             return resultJsonObj;
         }
 
-        return  null;
+        List<ComInterfaceInvoice> invoiceInfoList = JSONArray.parseArray(JSONObject.
+                parseObject(invoiceInfo).getString("list"), ComInterfaceInvoice.class);
+
+        //3.验证相关数据是否符合要求
+        ValidateResult nowValidateResult = ValidateInterface.validateInvoiceList(invoiceInfoList);
+        if (!nowValidateResult.isSuccess()) {
+            return nowValidateResult.getJsonObject();
+        }
+
+
+        List<Map<String, Object>> checkList;
+        //1.校验发票代码+发票号码+所属企业是否已经存在
+        try {
+            checkList = tradeInvoicenewManager.checkInvoiceForInterFace(invoiceInfoList);
+        } catch (Exception e) {
+            log.error("校验发票信息是否存在", e);
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】");
+            return resultJsonObj;//直接返回
+        }
+        for (int i = 0; i < checkList.size(); i++) {
+            Map<String, Object> map = checkList.get(i);
+            map.put("invoicePrimaryId", ToolUtils.getPrimaryId("2"));//生成发票主键
+            //用于关联后续上传的图片
+            map.put("invoiceImgId", ToolUtils.getPrimaryId("2"));//
+            map.put("saleImgId", ToolUtils.getPrimaryId("2"));
+            String companyPrimaryKey = map.get("COMPANYPRIMARYKEY").toString();//企业主键
+            String isExists = map.get("ISEXISTS").toString();//用于判断发票是否存在
+
+            JSONObject jsonObject = new JSONObject();//单条明细错误信息实体
+            JSONObject reason = new JSONObject();
+            jsonObject.put("companyPrimaryKey", companyPrimaryKey);
+            List<JSONObject> errorReasonList = new ArrayList<JSONObject>();//单条明细验证不通过原因集合
+            //数据已经存在
+            if (isExists.equals("1")) {
+                reason.put("errorCode", ResultCode.DATA_ALREADY_EXISTED.getCode());
+                reason.put("errorMsg", ResultCode.DATA_ALREADY_EXISTED.getMessage() + "【发票代码+发票号码已存在】");
+                errorReasonList.add(reason);
+            }
+            //如果发生错误，则添加错误原因
+            if (errorReasonList.size() != 0) {
+                jsonObject.put("errorReasonList", errorReasonList);
+                errorList.add(jsonObject);
+            }
+        }
+        if (errorList.size() != 0) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+        //region 与数据库交互
+        try {
+            //设置对应关系，待成功返回时，反馈给企业
+            for (Map<String, Object> map : checkList) {
+                JSONObject detailMap = new JSONObject();
+                detailMap.put("companyPrimaryKey", map.get("COMPANYPRIMARYKEY"));
+                detailMap.put("ID", map.get("invoicePrimaryId"));
+                detailMap.put("invoiceImgId", map.get("invoiceImgId"));
+                detailMap.put("saleImgId", map.get("saleImgId"));
+                successList.add(detailMap);
+            }
+            //设置操作人操作信息
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("list", checkList);
+            //与数据库交互
+            int num = tradeInvoicenewManager.addInvoiceInfo(params);
+            if (num > 0) {
+                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("successList", successList);
+                return resultJsonObj;
+            } else {
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+                return resultJsonObj;
+            }
+        } catch (Exception e) {
+            log.error("Failed to addInvoice", e);
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【上传票据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+            return resultJsonObj;
+        }
     }
 
     /**
@@ -414,7 +503,122 @@ public class CompInterfaceController {
     @RequestMapping(value = "/invoiceImage/addImage", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject addImage(String token, String imgList){
-        return null;
+
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(imgList) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            errorList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> tokenMap = validateToken.validateToken(token);
+        Integer resultCode = (Integer) tokenMap.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", tokenMap.get("resultCode"));
+            resultMap.put("errorMsg", tokenMap.get("resultMsg"));
+            errorList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (errorList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+
+        List <ComInterfaceImage> invoiceImgLst=new ArrayList<>();
+        try{
+            invoiceImgLst=JSONArray.parseArray(JSONObject.parseObject(imgList).getString("list"), ComInterfaceImage.class);
+        }catch (Exception e){
+            resultJsonObj.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            resultJsonObj.put("successList", successList);
+            return resultJsonObj;//直接返回
+        }
+        // 2、请求参数非空验证
+        ValidateResult nowValidateResult = ValidateInterface.validateImgList(invoiceImgLst);
+        if (!nowValidateResult.isSuccess()) {
+            return nowValidateResult.getJsonObject();
+        }
+        //3、验证图片路径是否可以访问
+
+        for (ComInterfaceImage item : invoiceImgLst) {
+            JSONObject returnMap = new JSONObject();//单条明细错误信息实体
+            //单条数据错误集合
+            List<Map<String, Object>> errorReasonList = new ArrayList<>();
+            TradeInvoicenew tradeInvoicenew = tradeInvoicenewManager.getById(item.getInvoicePrimaryID());
+            if(tradeInvoicenew==null){
+                Map<String, Object> errorReasonMap = new HashMap<>(16);
+                errorReasonMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+                errorReasonMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage() + "【发票信息不存在】");
+                errorReasonList.add(errorReasonMap);
+            }else{
+                item.setImgPrimaryID(item.getImageType().equals("0")?tradeInvoicenew.getInvoiceimgid():tradeInvoicenew.getInvoiceimgid2());
+            }
+            if (errorReasonList.size() > 0) {
+                returnMap.put("companyPrimaryKey", item.getCompanyPrimaryKey());
+                returnMap.put("errorReasonList", errorReasonList);
+                errorList.add(returnMap);
+            }
+        }
+        if (errorList.size() != 0) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+        try {
+            List<Map<String, Object>> checkList = new ArrayList<>();
+            for (ComInterfaceImage item : invoiceImgLst) {
+                Map<String, Object> imgs = new HashMap<>(16);
+                imgs.put("companyPrimaryKey", item.getCompanyPrimaryKey());
+                imgs.put("ID", ToolUtils.getPrimaryId("2"));
+                imgs.put("imgPrimaryID", item.getImgPrimaryID());
+                imgs.put("invoicePrimaryID", item.getInvoicePrimaryID());
+                imgs.put("imageType", item.getImageType().equals("0") ? "9" : "10");
+                imgs.put("fileName", "发票图片(接口)");
+                imgs.put("imgOriginalUrl", item.getImgUrl());
+                imgs.put("imgThumbUrl", item.getImgUrl());
+                //随货单图片(接口)   77B4A1B9DB4301D0E053C0A8757101D0
+                //发票图片(接口)      77B4A1B9DB4201D0E053C0A8757101D0
+                imgs.put("folderId", item.getImageType().equals("0") ? "77B4A1B9DB4201D0E053C0A8757101D0" : "77B4A1B9DB4301D0E053C0A8757101D0");
+                imgs.put("orgId", tokenMap.get("orgId").toString());
+                checkList.add(imgs);
+                //设置返回对应关系
+                JSONObject detailMap = new JSONObject();
+                detailMap.put("companyPrimaryKey", item.getCompanyPrimaryKey());
+                detailMap.put("ID", imgs.get("ID"));
+                successList.add(detailMap);
+            }
+            //4、数据操作
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("list", checkList);
+            //与数据库(省平台)交互
+            int num = baseImgannexManager.addInvoiceImageProvince(params);
+            if (num > 0) {
+                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("successList", successList);
+            } else {
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            }
+
+        } catch (Exception e) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【操作错误，请联系管理员】");
+            return resultJsonObj;//直接返回
+        }
+        return resultJsonObj;
+
     }
 
     /**
@@ -427,7 +631,156 @@ public class CompInterfaceController {
     @RequestMapping(value = "/saleList/addSale", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject addSale(String token, String saleInfo){
-        return null;
+
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(saleInfo) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            errorList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> tokenMap = validateToken.validateToken(token);
+        Integer resultCode = (Integer) tokenMap.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", tokenMap.get("resultCode"));
+            resultMap.put("errorMsg", tokenMap.get("resultMsg"));
+            errorList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (errorList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+
+        //2.数据非空验证
+        List<ComInterfaceSaleList> saleList = JSONArray.parseArray(JSONObject.
+                parseObject(saleInfo).getString("list"), ComInterfaceSaleList.class);
+        //3.验证相关数据是否符合要求
+        ValidateResult nowValidateResult = ValidateInterface.validateSaleList(saleList);
+        if (!nowValidateResult.isSuccess()) {
+            return nowValidateResult.getJsonObject();
+        }
+        //数据库校验
+        List<Map<String, Object>> checkList;
+        //1.发票主键+产品ID+批号是否已经存在
+        try {
+            checkList = tradeGoodslistManager.checkSaleIsExistsByInterface(saleList);
+        } catch (Exception e) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】");
+            return resultJsonObj;//直接返回
+        }
+
+        for (int i = 0; i < checkList.size(); i++) {
+            Map<String, Object> map = checkList.get(i);
+            String companyPrimaryKey = map.get("COMPANYPRIMARYKEY").toString();//企业主键
+            String isExists = map.get("ISEXISTS").toString();//用于判断发票是否存在
+            JSONObject returnMap = new JSONObject();//单条明细错误信息实体
+            returnMap.put("companyPrimaryKey", companyPrimaryKey);
+            List<JSONObject> errorReasonList = new ArrayList<JSONObject>();//单条明细验证不通过原因集合
+            //数据已经存在
+            if (isExists.equals("1")) {
+                JSONObject errorMap = new JSONObject();
+                errorMap.put("errorCode", ResultCode.DATA_ALREADY_EXISTED.getCode());
+                errorMap.put("errorMsg", ResultCode.DATA_ALREADY_EXISTED.getMessage() + "【发票主键+产品ID+批号已存在】");
+                errorReasonList.add(errorMap);
+            }
+            //如果发生错误，则添加错误原因
+            if (errorReasonList.size() != 0) {
+                returnMap.put("errorReasonList", errorReasonList);
+                errorList.add(returnMap);
+            }
+        }
+        if (errorList.size() != 0) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+
+        //2.校验发票与产品是否在系统中存在
+        try {
+            checkList = tradeGoodslistManager.checkSaleDataByInterface(saleList);
+        } catch (Exception e) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】");
+            return resultJsonObj;//直接返回
+        }
+
+        for (int i = 0; i < checkList.size(); i++) {
+            Map<String, Object> map = checkList.get(i);
+            map.put("ID", ToolUtils.getPrimaryId("2"));
+            String companyPrimaryKey = map.get("COMPANYPRIMARYKEY").toString();//企业主键
+            String invoiceIsExists = map.get("INVOICEISEXISTS").toString();
+            String goodsIsExists = map.get("GOODSISEXISTS").toString();
+
+            JSONObject returnMap = new JSONObject();//单条明细错误信息实体
+            returnMap.put("companyPrimaryKey", companyPrimaryKey);
+            List<JSONObject> errorReasonList = new ArrayList<JSONObject>();//单条明细验证不通过原因集合
+
+            if (invoiceIsExists.equals("0")) {
+                JSONObject errorMap = new JSONObject();
+                errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage() + "【发票不存在】");
+                errorReasonList.add(errorMap);
+            }
+
+            if (goodsIsExists.equals("0")) {
+                JSONObject errorMap = new JSONObject();
+                errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage() + "【产品ID不存在】");
+                errorReasonList.add(errorMap);
+            }
+
+            //如果发生错误，则添加错误原因
+            if (errorReasonList.size() != 0) {
+                returnMap.put("errorReasonList", errorReasonList);
+                errorList.add(returnMap);
+            }
+        }
+        if (errorList.size() != 0) {
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+        //region 与数据库交互
+        try {
+            //设置对应关系，待成功返回时，反馈给企业
+            for (Map<String, Object> map : checkList) {
+                JSONObject detailMap = new JSONObject();
+                detailMap.put("companyPrimaryKey", map.get("COMPANYPRIMARYKEY"));
+                detailMap.put("ID", map.get("ID"));
+                successList.add(detailMap);
+            }
+            Map<String, Object> params = new HashMap<String, Object>();
+            params.put("list", checkList);
+            params.put("orgId", tokenMap.get("userId").toString());
+            //与数据库交互(省平台)
+            int num = tradeGoodslistManager.addSaleInfo(params);
+            if (num > 0) {
+                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("successList", successList);
+            } else {
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            }
+        } catch (Exception e) {
+            log.error("Failed to addInvoice", e);
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage()+ "【上传票据清单错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+        }
+        return resultJsonObj;
     }
 
     /**
@@ -441,7 +794,94 @@ public class CompInterfaceController {
     @RequestMapping(value = "/distribution/invoiceInfo", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject getInvoiceCheckInfo(String token, String startTime, String endTime, String currentPageNumber){
-        return null;
+
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(startTime)
+                || StringUtils.isEmpty(endTime) || StringUtils.isEmpty(currentPageNumber) ){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            errorList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> tokenMap = validateToken.validateToken(token);
+        Integer resultCode = (Integer) tokenMap.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", tokenMap.get("resultCode"));
+            resultMap.put("errorMsg", tokenMap.get("resultMsg"));
+            errorList.add(resultMap);
+        }
+        //验证数据有效性
+        //1.页数是否为正整数
+        if(!ValidateUtil.checkCount(currentPageNumber)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_INVALID.getCode());
+            errorList.add(resultMap);
+        }
+        //2.时间格式是否正确
+        if (!ValidateUtil.checkDate(startTime) || !ValidateUtil.checkDate(endTime) ){
+            resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+            errorList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (errorList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+
+
+        //4、数据整理
+        try {
+            Pagination page = new Pagination();
+            Map<String, Object> paramsMap = new HashMap<String, Object>();
+            paramsMap.put("startTime", startTime);
+            paramsMap.put("endTime", endTime);
+            paramsMap.put("companyIdPs", tokenMap.get("orgId").toString());
+            page.setConditions(paramsMap);
+            page.setPage(Integer.parseInt(currentPageNumber));
+            page.setCount(Integer.parseInt(pageSize));// 每页查询数据量
+            page.setOrderby();
+            //数据库交换
+            tradeDisrecManager.getVerificationInvoiceResultList(page);
+            Page<Map<String, Object>> detailsPage = (Page<Map<String, Object>>) page.getRows();
+            int totalPages = detailsPage.getPages();
+            int cur = detailsPage.getPageNum();
+            long total = detailsPage.getTotal();// 总记录数
+            List<Map<String, Object>> details = detailsPage;
+            if (details != null && details.size() > 0) {
+                for (Map<String, Object> detail : details) {
+                    JSONObject returnMap = new JSONObject(16);
+                    returnMap.put("distributeId", detail.get("DISRECID"));
+                    returnMap.put("invoicePrimaryKeyId", detail.get("INVOICEPRIMARYKEYID"));
+                    returnMap.put("invoiceId", detail.get("INVOICEID"));
+                    returnMap.put("invoiceCode", detail.get("INVOICECODE"));
+                    returnMap.put("comid_ps", detail.get("COMID_PS"));
+                    returnMap.put("checkResult", detail.get("FLAGLOG"));
+                    returnMap.put("submittime", detail.get("SUBMITTIME"));
+                    successList.add(returnMap);
+                }
+            }
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
+            resultJsonObj.put("currentPageNumber", cur);// 按照数据返回正确的页码
+            resultJsonObj.put("totalPageCount", totalPages);
+            resultJsonObj.put("totalRecordCount", total);
+            resultJsonObj.put("dataList", successList);
+        } catch (Exception e) {
+            log.error("Failed to confirmOrder", e);
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+        }
+        return resultJsonObj;
     }
 
     /**
@@ -550,7 +990,110 @@ public class CompInterfaceController {
     @RequestMapping(value = "/distribution/addDistributeInvoice", method = {RequestMethod.POST})
     @ResponseBody
     public JSONObject addDistributeInvoice(String token, String distributeInfo){
-        return null;
+        JSONObject resultJsonObj = new JSONObject();
+        List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
+        List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
+        Map<String, Object> resultMap = new HashMap<String, Object>();
+
+        //验证参数是否为空
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(distributeInfo)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
+            errorList.add(resultMap);
+        }
+
+        //验证token
+        Map<String, Object> tokenMap = validateToken.validateToken(token);
+        Integer resultCode = (Integer) tokenMap.get("resultCode");
+        if (!resultCode.equals(ResultCode.SUCCESS.getCode())) {
+            resultMap.put("errorCode", tokenMap.get("resultCode"));
+            resultMap.put("errorMsg", tokenMap.get("resultMsg"));
+            errorList.add(resultMap);
+        }
+
+        // 判断是否所有验证都已通过
+        if (errorList.size() != 0){
+            resultJsonObj.put("resultCode",  ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+            resultJsonObj.put("errorList", errorList);
+            return resultJsonObj;
+        }
+
+        //请求数据转换为list
+        List<DistributeInfo> list = JSONObject.parseArray(JSONObject.
+                parseObject(distributeInfo).getString("list"), DistributeInfo.class);
+
+        //3、验证数据是否符合规范
+        ValidateResult nowValidateResult = ValidateInterface.validataInvioceDistributeData(list);
+        if (!nowValidateResult.isSuccess()) {
+            return nowValidateResult.getJsonObject();
+        }
+        try {
+
+            //4、数据库校验数据
+            List<Map<String, Object>> checkList;
+            Map<String, Object> checkDetailMap = new HashMap<>();//存储list，用于校验接口数据
+            checkDetailMap.put("detailList", nowValidateResult.getDistributeInfoList());//设置订单明细集合
+            checkList = tradeDisrecManager.checkDistributeInvoiceDataByInterface(checkDetailMap);
+            for (int i = 0; i < checkList.size(); i++) {
+                Map<String, Object> map = checkList.get(i);
+                String companyDistributeId = map.get("COMPANYDISTRIBUTEID").toString();//企业配送明细编号
+                String isExists = map.get("ISEXISTS").toString();//用于判断订单明细是否存在
+                String isCanDistribute = map.get("ISCANDISTRIBUTE").toString();//用于判断状态是否可配送
+                String orderDetailState = (String)map.get("DETAILSTATUS");//用于提示当前处于何种状态
+
+                JSONObject returnMap = new JSONObject();//单条明细错误信息实体
+                returnMap.put("companyDistributeId", companyDistributeId);
+                List<JSONObject> errorReasonList = new ArrayList<JSONObject>();//单条明细验证不通过原因集合
+                //数据不存在
+                if (isExists.equals("0")) {
+                    JSONObject errorMap = new JSONObject();
+                    errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage());
+                    errorReasonList.add(errorMap);
+                } else if (isCanDistribute.equals("0")) {   //数据状态不符合
+                    JSONObject errorMap = new JSONObject();
+                    errorMap.put("errorCode", ResultCode.DATA_STATUS_ERROR.getCode());
+                    errorMap.put("errorMsg", ResultCode.DATA_STATUS_ERROR.getMessage() + "【当前数据状态为[" + OrderDetailStatus.getValueByKey(Integer.parseInt(orderDetailState)) + "]已不可补录】");
+                    errorReasonList.add(errorMap);
+                }
+                //如果发生错误，则添加错误原因
+                if (errorReasonList.size() != 0) {
+                    returnMap.put("errorReasonList", errorReasonList);
+                    errorList.add(returnMap);
+                }
+            }
+
+            //返回校验结果
+            if (errorList.size() != 0) {
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
+                resultJsonObj.put("errorList", errorList);
+                return resultJsonObj;
+            }
+
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("invoiceList", nowValidateResult.getDistributeInfoList());
+            map.put("userId", tokenMap.get("userId").toString());
+            map.put("userName", tokenMap.get("userName").toString());
+            //与数据库交互
+            //省平台直接交换，
+            int num = tradeDisrecManager.addInvoiceDistributeData(map);
+            if (num > 0) {
+                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("successList", successList);
+            } else {
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());// 配送失败
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【配送数据不存在】");
+            }
+        } catch (Exception e) {
+            log.error("Failed to distribute", e);
+            //插入执行日志
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【发票补录错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
+        }
+        return resultJsonObj;
     }
 
     /**

@@ -1,0 +1,543 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trade.dao.TradeInvoicenewDao">
+	<resultMap type="com.trade.model.TradeInvoicenew" id="BaseResultMap">
+		<result property="id" column="ID" javaType="String" />
+		<result property="invoiceid" column="INVOICEID" javaType="String" />
+		<result property="invoicecode" column="INVOICECODE" javaType="String" />
+		<result property="invoicedate" column="INVOICEDATE" javaType="Date" />
+		<result property="totaltaxprice" column="TOTALTAXPRICE" javaType="BigDecimal" />
+		<result property="invoicetype" column="INVOICETYPE" javaType="String" />
+		<result property="fatherid" column="FATHERID" javaType="String" />
+		<result property="companyidSell" column="COMPANYID_SELL" javaType="String" />
+		<result property="companynameSell" column="COMPANYNAME_SELL" javaType="String" />
+		<result property="selltaxpayernumber" column="SELLTAXPAYERNUMBER" javaType="String" />
+		<result property="sellremark" column="SELLREMARK" javaType="String" />
+		<result property="companyidBuy" column="COMPANYID_BUY" javaType="String" />
+		<result property="companynameBuy" column="COMPANYNAME_BUY" javaType="String" />
+		<result property="buytaxpayernumber" column="BUYTAXPAYERNUMBER" javaType="String" />
+		<result property="buyremark" column="BUYREMARK" javaType="String" />
+		<result property="changeperson" column="CHANGEPERSON" javaType="String" />
+		<result property="changetime" column="CHANGETIME" javaType="Date" />
+		<result property="changereason" column="CHANGEREASON" javaType="String" />
+		<result property="invoiceimgid" column="INVOICEIMGID" javaType="String" />
+		<result property="adduserid" column="ADDUSERID" javaType="String" />
+		<result property="addtime" column="ADDTIME" javaType="Date" />
+		<result property="submitstatus" column="SUBMITSTATUS" javaType="String" />
+		<result property="submittime" column="SUBMITTIME" javaType="Date" />
+		<result property="invoiceimgid2" column="INVOICEIMGID2" javaType="String" />
+		<result property="flag" column="FLAG" javaType="BigDecimal" />
+		<result property="invoicepayserialid" column="INVOICEPAYSERIALID" javaType="Object" />
+		<result property="isshow" column="ISSHOW" javaType="BigDecimal" />
+	</resultMap>
+
+	<sql id="full-columns">
+		t.ID,
+		t.INVOICEID,
+		t.INVOICECODE,
+		t.INVOICEDATE,
+		t.TOTALTAXPRICE,
+		t.INVOICETYPE,
+		t.FATHERID,
+		t.COMPANYID_SELL,
+		t.COMPANYNAME_SELL,
+		t.SELLTAXPAYERNUMBER,
+		t.SELLREMARK,
+		t.COMPANYID_BUY,
+		t.COMPANYNAME_BUY,
+		t.BUYTAXPAYERNUMBER,
+		t.BUYREMARK,
+		t.CHANGEPERSON,
+		t.CHANGETIME,
+		t.CHANGEREASON,
+		t.INVOICEIMGID,
+		t.ADDUSERID,
+		t.ADDTIME,
+		t.SUBMITSTATUS,
+		t.SUBMITTIME,
+		t.INVOICEIMGID2,
+		t.FLAG,
+		t.INVOICEPAYSERIALID,
+		t.ISSHOW
+	</sql>
+
+	<sql id="common_where_if">
+		<if test="@OGNL@isNotEmpty(id)">
+			AND t.ID = #{id}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoiceid)">
+			AND t.INVOICEID = #{invoiceid}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoicecode)">
+			AND t.INVOICECODE = #{invoicecode}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoicedate)">
+			AND t.INVOICEDATE = #{invoicedate}
+		</if>
+		<if test="@OGNL@isNotEmpty(totaltaxprice)">
+			AND t.TOTALTAXPRICE = #{totaltaxprice}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoicetype)">
+			AND t.INVOICETYPE = #{invoicetype}
+		</if>
+		<if test="@OGNL@isNotEmpty(fatherid)">
+			AND t.FATHERID = #{fatherid}
+		</if>
+		<if test="@OGNL@isNotEmpty(companyidSell)">
+			AND t.COMPANYID_SELL = #{companyidSell}
+		</if>
+		<if test="@OGNL@isNotEmpty(companynameSell)">
+			AND t.COMPANYNAME_SELL = #{companynameSell}
+		</if>
+		<if test="@OGNL@isNotEmpty(selltaxpayernumber)">
+			AND t.SELLTAXPAYERNUMBER = #{selltaxpayernumber}
+		</if>
+		<if test="@OGNL@isNotEmpty(sellremark)">
+			AND t.SELLREMARK = #{sellremark}
+		</if>
+		<if test="@OGNL@isNotEmpty(companyidBuy)">
+			AND t.COMPANYID_BUY = #{companyidBuy}
+		</if>
+		<if test="@OGNL@isNotEmpty(companynameBuy)">
+			AND t.COMPANYNAME_BUY = #{companynameBuy}
+		</if>
+		<if test="@OGNL@isNotEmpty(buytaxpayernumber)">
+			AND t.BUYTAXPAYERNUMBER = #{buytaxpayernumber}
+		</if>
+		<if test="@OGNL@isNotEmpty(buyremark)">
+			AND t.BUYREMARK = #{buyremark}
+		</if>
+		<if test="@OGNL@isNotEmpty(changeperson)">
+			AND t.CHANGEPERSON = #{changeperson}
+		</if>
+		<if test="@OGNL@isNotEmpty(changetime)">
+			AND t.CHANGETIME = #{changetime}
+		</if>
+		<if test="@OGNL@isNotEmpty(changereason)">
+			AND t.CHANGEREASON = #{changereason}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoiceimgid)">
+			AND t.INVOICEIMGID = #{invoiceimgid}
+		</if>
+		<if test="@OGNL@isNotEmpty(adduserid)">
+			AND t.ADDUSERID = #{adduserid}
+		</if>
+		<if test="@OGNL@isNotEmpty(addtime)">
+			AND t.ADDTIME = #{addtime}
+		</if>
+		<if test="@OGNL@isNotEmpty(submitstatus)">
+			AND t.SUBMITSTATUS = #{submitstatus}
+		</if>
+		<if test="@OGNL@isNotEmpty(submittime)">
+			AND t.SUBMITTIME = #{submittime}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoiceimgid2)">
+			AND t.INVOICEIMGID2 = #{invoiceimgid2}
+		</if>
+		<if test="@OGNL@isNotEmpty(flag)">
+			AND t.FLAG = #{flag}
+		</if>
+		<if test="@OGNL@isNotEmpty(invoicepayserialid)">
+			AND t.INVOICEPAYSERIALID = #{invoicepayserialid}
+		</if>
+		<if test="@OGNL@isNotEmpty(isshow)">
+			AND t.ISSHOW = #{isshow}
+		</if>
+	</sql>
+
+	<select id="getById" parameterType="java.lang.String"
+			resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM TRADE_INVOICENEW t
+		WHERE t.ID = #{value}
+	</select>
+
+	<select id="countByParams" parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM TRADE_INVOICENEW t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM TRADE_INVOICENEW t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.trade.model.TradeInvoicenew">
+		INSERT INTO TRADE_INVOICENEW(
+		ID ,
+		INVOICEID ,
+		INVOICECODE ,
+		INVOICEDATE ,
+		TOTALTAXPRICE ,
+		INVOICETYPE ,
+		FATHERID ,
+		COMPANYID_SELL ,
+		COMPANYNAME_SELL ,
+		SELLTAXPAYERNUMBER ,
+		SELLREMARK ,
+		COMPANYID_BUY ,
+		COMPANYNAME_BUY ,
+		BUYTAXPAYERNUMBER ,
+		BUYREMARK ,
+		CHANGEPERSON ,
+		CHANGETIME ,
+		CHANGEREASON ,
+		INVOICEIMGID ,
+		ADDUSERID ,
+		ADDTIME ,
+		SUBMITSTATUS ,
+		SUBMITTIME ,
+		INVOICEIMGID2 ,
+		FLAG ,
+		INVOICEPAYSERIALID ,
+		ISSHOW
+		)
+		VALUES (
+		#{id} ,
+		#{invoiceid} ,
+		#{invoicecode} ,
+		#{invoicedate} ,
+		#{totaltaxprice} ,
+		#{invoicetype} ,
+		#{fatherid} ,
+		#{companyidSell} ,
+		#{companynameSell} ,
+		#{selltaxpayernumber} ,
+		#{sellremark} ,
+		#{companyidBuy} ,
+		#{companynameBuy} ,
+		#{buytaxpayernumber} ,
+		#{buyremark} ,
+		#{changeperson} ,
+		#{changetime} ,
+		#{changereason} ,
+		#{invoiceimgid} ,
+		#{adduserid} ,
+		#{addtime} ,
+		#{submitstatus} ,
+		#{submittime} ,
+		#{invoiceimgid2} ,
+		#{flag} ,
+		#{invoicepayserialid} ,
+		#{isshow}
+		)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO TRADE_INVOICENEW (
+		ID ,
+		INVOICEID ,
+		INVOICECODE ,
+		INVOICEDATE ,
+		TOTALTAXPRICE ,
+		INVOICETYPE ,
+		FATHERID ,
+		COMPANYID_SELL ,
+		COMPANYNAME_SELL ,
+		SELLTAXPAYERNUMBER ,
+		SELLREMARK ,
+		COMPANYID_BUY ,
+		COMPANYNAME_BUY ,
+		BUYTAXPAYERNUMBER ,
+		BUYREMARK ,
+		CHANGEPERSON ,
+		CHANGETIME ,
+		CHANGEREASON ,
+		INVOICEIMGID ,
+		ADDUSERID ,
+		ADDTIME ,
+		SUBMITSTATUS ,
+		SUBMITTIME ,
+		INVOICEIMGID2 ,
+		FLAG ,
+		INVOICEPAYSERIALID ,
+		ISSHOW
+		)
+		<foreach collection="list" item="item" separator=" union all ">
+			SELECT
+			#{item.id} id,
+			#{item.invoiceid} invoiceid,
+			#{item.invoicecode}invoicecode,
+			#{item.invoicedate} invoicedate,
+			#{item.totaltaxprice} totaltaxprice,
+			#{item.invoicetype} invoicetype,
+			#{item.fatherid} fatherid,
+			#{item.companyidSell} companyidSell,
+			#{item.companynameSell} companynameSell,
+			#{item.selltaxpayernumber} selltaxpayernumber,
+			#{item.sellremark} sellremark,
+			#{item.companyidBuy} companyidBuy,
+			#{item.companynameBuy} companynameBuy,
+			#{item.buytaxpayernumber} buytaxpayernumber,
+			#{item.buyremark} buyremark,
+			#{item.changeperson} changeperson,
+			#{item.changetime} changetime,
+			#{item.changereason} changereason,
+			#{item.invoiceimgid} invoiceimgid,
+			#{item.adduserid} adduserid,
+			#{item.addtime} addtime,
+			#{item.submitstatus} submitstatus,
+			#{item.submittime} submittime,
+			#{item.invoiceimgid2} invoiceimgid2,
+			#{item.flag} flag,
+			#{item.invoicepayserialid} invoicepayserialid,
+			#{item.isshow} isshow
+			FROM DUAL
+		</foreach>
+	</insert>
+
+	<update id="updateById" parameterType="com.trade.model.TradeInvoicenew">
+		UPDATE TRADE_INVOICENEW
+		<set>
+			INVOICEID =
+			#{invoiceid},
+			INVOICECODE =
+			#{invoicecode},
+			INVOICEDATE =
+			#{invoicedate},
+			TOTALTAXPRICE =
+			#{totaltaxprice},
+			INVOICETYPE =
+			#{invoicetype},
+			FATHERID =
+			#{fatherid},
+			COMPANYID_SELL =
+			#{companyidSell},
+			COMPANYNAME_SELL =
+			#{companynameSell},
+			SELLTAXPAYERNUMBER =
+			#{selltaxpayernumber},
+			SELLREMARK =
+			#{sellremark},
+			COMPANYID_BUY =
+			#{companyidBuy},
+			COMPANYNAME_BUY =
+			#{companynameBuy},
+			BUYTAXPAYERNUMBER =
+			#{buytaxpayernumber},
+			BUYREMARK =
+			#{buyremark},
+			CHANGEPERSON =
+			#{changeperson},
+			CHANGETIME =
+			#{changetime},
+			CHANGEREASON =
+			#{changereason},
+			INVOICEIMGID =
+			#{invoiceimgid},
+			ADDUSERID =
+			#{adduserid},
+			ADDTIME =
+			#{addtime},
+			SUBMITSTATUS =
+			#{submitstatus},
+			SUBMITTIME =
+			#{submittime},
+			INVOICEIMGID2 =
+			#{invoiceimgid2},
+			FLAG =
+			#{flag},
+			INVOICEPAYSERIALID =
+			#{invoicepayserialid},
+			ISSHOW =
+			#{isshow},
+		</set>
+		WHERE ID =
+		#{id}
+	</update>
+
+	<update id="updateBySelective" parameterType="com.trade.model.TradeInvoicenew">
+		UPDATE TRADE_INVOICENEW
+		<set>
+			<if test="@OGNL@isNotEmpty(invoiceid)">
+				INVOICEID =
+				#{invoiceid},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoicecode)">
+				INVOICECODE =
+				#{invoicecode},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoicedate)">
+				INVOICEDATE =
+				#{invoicedate},
+			</if>
+			<if test="@OGNL@isNotEmpty(totaltaxprice)">
+				TOTALTAXPRICE =
+				#{totaltaxprice},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoicetype)">
+				INVOICETYPE =
+				#{invoicetype},
+			</if>
+			<if test="@OGNL@isNotEmpty(fatherid)">
+				FATHERID =
+				#{fatherid},
+			</if>
+			<if test="@OGNL@isNotEmpty(companyidSell)">
+				COMPANYID_SELL =
+				#{companyidSell},
+			</if>
+			<if test="@OGNL@isNotEmpty(companynameSell)">
+				COMPANYNAME_SELL =
+				#{companynameSell},
+			</if>
+			<if test="@OGNL@isNotEmpty(selltaxpayernumber)">
+				SELLTAXPAYERNUMBER =
+				#{selltaxpayernumber},
+			</if>
+			<if test="@OGNL@isNotEmpty(sellremark)">
+				SELLREMARK =
+				#{sellremark},
+			</if>
+			<if test="@OGNL@isNotEmpty(companyidBuy)">
+				COMPANYID_BUY =
+				#{companyidBuy},
+			</if>
+			<if test="@OGNL@isNotEmpty(companynameBuy)">
+				COMPANYNAME_BUY =
+				#{companynameBuy},
+			</if>
+			<if test="@OGNL@isNotEmpty(buytaxpayernumber)">
+				BUYTAXPAYERNUMBER =
+				#{buytaxpayernumber},
+			</if>
+			<if test="@OGNL@isNotEmpty(buyremark)">
+				BUYREMARK =
+				#{buyremark},
+			</if>
+			<if test="@OGNL@isNotEmpty(changeperson)">
+				CHANGEPERSON =
+				#{changeperson},
+			</if>
+			<if test="@OGNL@isNotEmpty(changetime)">
+				CHANGETIME =
+				#{changetime},
+			</if>
+			<if test="@OGNL@isNotEmpty(changereason)">
+				CHANGEREASON =
+				#{changereason},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoiceimgid)">
+				INVOICEIMGID =
+				#{invoiceimgid},
+			</if>
+			<if test="@OGNL@isNotEmpty(adduserid)">
+				ADDUSERID =
+				#{adduserid},
+			</if>
+			<if test="@OGNL@isNotEmpty(addtime)">
+				ADDTIME =
+				#{addtime},
+			</if>
+			<if test="@OGNL@isNotEmpty(submitstatus)">
+				SUBMITSTATUS =
+				#{submitstatus},
+			</if>
+			<if test="@OGNL@isNotEmpty(submittime)">
+				SUBMITTIME =
+				#{submittime},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoiceimgid2)">
+				INVOICEIMGID2 =
+				#{invoiceimgid2},
+			</if>
+			<if test="@OGNL@isNotEmpty(flag)">
+				FLAG =
+				#{flag},
+			</if>
+			<if test="@OGNL@isNotEmpty(invoicepayserialid)">
+				INVOICEPAYSERIALID =
+				#{invoicepayserialid},
+			</if>
+			<if test="@OGNL@isNotEmpty(isshow)">
+				ISSHOW =
+				#{isshow},
+			</if>
+		</set>
+		WHERE ID =
+		#{id}
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		TRADE_INVOICENEW WHERE ID = #{value}
+	</delete>
+
+	<insert id="addInvoiceInfo" parameterType="java.util.List">
+		INSERT INTO TRADE_INVOICENEW (
+		ID ,
+		INVOICEID ,
+		INVOICECODE ,
+		INVOICEDATE ,
+		TOTALTAXPRICE ,
+		INVOICETYPE ,
+		COMPANYID_SELL ,
+		COMPANYNAME_SELL ,
+		SELLTAXPAYERNUMBER ,
+		SELLREMARK ,
+		COMPANYID_BUY ,
+		COMPANYNAME_BUY ,
+		BUYTAXPAYERNUMBER ,
+		BUYREMARK ,
+		INVOICEIMGID ,
+		ADDUSERID ,
+		ADDTIME ,
+		SUBMITSTATUS ,
+		SUBMITTIME ,
+		INVOICEIMGID2
+		)
+		SELECT n.id,n.invoiceid,n.invoicecode,n.invoicedate,n.totaltaxprice,n.invoicetype,
+		case when n.companyidSell IS null then t.ID else n.companyidSell end companyidSell,
+		n.companynameSell,n.selltaxpayernumber,n.sellremark,
+		CASE WHEN n.companyidBuy IS NOT null then n.companyidBuy WHEN N.invoicetype='2' THEN H.ID ELSE C.ID END companyidBuy,
+		n.companynameBuy,n.buytaxpayernumber,
+		n.buyremark,n.invoiceimgid,n.adduserid,n.addtime,n.submitstatus,n.submittime,n.invoiceimgid2
+		FROM (
+		<foreach collection="list" item="item" open="(" separator=" union all " close=")">
+			SELECT
+			#{item.id} id,
+			#{item.invoiceid} invoiceid,
+			#{item.invoicecode}invoicecode,
+			#{item.invoicedate} invoicedate,
+			#{item.totaltaxprice} totaltaxprice,
+			#{item.invoicetype} invoicetype,
+			#{item.companyidSell,jdbcType=VARCHAR} companyidSell,
+			#{item.companynameSell} companynameSell,
+			#{item.selltaxpayernumber} selltaxpayernumber,
+			#{item.sellremark,jdbcType=VARCHAR} sellremark,
+			#{item.companyidBuy,jdbcType=VARCHAR} companyidBuy,
+			#{item.companynameBuy} companynameBuy,
+			#{item.buytaxpayernumber} buytaxpayernumber,
+			#{item.buyremark,jdbcType=VARCHAR} buyremark,
+			#{item.invoiceimgid} invoiceimgid,
+			#{item.adduserid} adduserid,
+			#{item.addtime} addtime,
+			#{item.submitstatus} submitstatus,
+			#{item.submittime} submittime,
+			#{item.invoiceimgid2} invoiceimgid2
+			FROM DUAL
+		</foreach>) n
+		LEFT JOIN TRADE_COMINFO t on t.companyname=n.companynameSell
+		LEFT JOIN TRADE_COMINFO C ON N.companynameBuy=C.COMPANYNAME
+		LEFT JOIN TRADE_HOS H ON H.HOSPITALNAME=N.companynameBuy
+	</insert>
+
+	<select id="getNameCount" parameterType="map" resultType="int">
+		SELECT  COUNT(*)
+		FROM SYS_USER
+		<where>
+			<if test="@OGNL@isNotEmpty(username)">
+				AND USERNAME =#{username}
+			</if>
+		</where>
+
+	</select>
+</mapper>

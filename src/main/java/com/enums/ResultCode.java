@@ -65,7 +65,9 @@ public enum ResultCode {
     RESULT_DATA_NONE(50001, "数据未找到"),
     DATA_IS_WRONG(50002, "数据有误"),
     DATA_ALREADY_EXISTED(50003, "数据已存在"),
-    DISTRIBUTE_NUMBER_ERROR(50004, "数据已存在"),
+    DISTRIBUTE_NUMBER_ERROR(50004, "配送数量异常"),
+    DATA_STATUS_ERROR(50005, "数据状态不符"),
+    DATA_RESUBMIT(50006, "数据重复提交"),
 
     /* 接口错误：60001-69999 */
     INTERFACE_INNER_INVOKE_ERROR(60001, "内部系统接口调用异常"),

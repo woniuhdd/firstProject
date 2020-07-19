@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.trade.dao.BaseImgannexDao">
+	<resultMap type="com.trade.model.BaseImgannex" id="BaseResultMap">
+		<result property="imgannexid" column="IMGANNEXID" javaType="String" />
+		<result property="imgannextype" column="IMGANNEXTYPE" javaType="String" />
+		<result property="comid" column="COMID" javaType="String" />
+		<result property="comregid" column="COMREGID" javaType="String" />
+		<result property="imgannexname" column="IMGANNEXNAME" javaType="String" />
+		<result property="imgannexurl" column="IMGANNEXURL" javaType="String" />
+		<result property="imgannexstatus" column="IMGANNEXSTATUS" javaType="String" />
+		<result property="imgannexremark" column="IMGANNEXREMARK" javaType="String" />
+		<result property="dataclassid" column="DATACLASSID" javaType="String" />
+		<result property="adduserid" column="ADDUSERID" javaType="String" />
+		<result property="addtime" column="ADDTIME" javaType="Date" />
+		<result property="narrowimgurl" column="NARROWIMGURL" javaType="String" />
+		<result property="folderid" column="FOLDERID" javaType="String" />
+	</resultMap>
+
+	<sql id="full-columns">
+		t.IMGANNEXID,
+		t.IMGANNEXTYPE,
+		t.COMID,
+		t.COMREGID,
+		t.IMGANNEXNAME,
+		t.IMGANNEXURL,
+		t.IMGANNEXSTATUS,
+		t.IMGANNEXREMARK,
+		t.DATACLASSID,
+		t.ADDUSERID,
+		t.ADDTIME,
+		t.NARROWIMGURL,
+		t.FOLDERID
+	</sql>
+	
+	<sql id="common_where_if">
+			<if test="@OGNL@isNotEmpty(imgannexid)">
+				AND t.IMGANNEXID = #{imgannexid}
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannextype)">
+				AND t.IMGANNEXTYPE = #{imgannextype}
+			</if>
+			<if test="@OGNL@isNotEmpty(comid)">
+				AND t.COMID = #{comid}
+			</if>
+			<if test="@OGNL@isNotEmpty(comregid)">
+				AND t.COMREGID = #{comregid}
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexname)">
+				AND t.IMGANNEXNAME = #{imgannexname}
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexurl)">
+				AND t.IMGANNEXURL = #{imgannexurl}
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexstatus)">
+				AND t.IMGANNEXSTATUS = #{imgannexstatus}
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexremark)">
+				AND t.IMGANNEXREMARK = #{imgannexremark}
+			</if>
+			<if test="@OGNL@isNotEmpty(dataclassid)">
+				AND t.DATACLASSID = #{dataclassid}
+			</if>
+			<if test="@OGNL@isNotEmpty(adduserid)">
+				AND t.ADDUSERID = #{adduserid}
+			</if>
+			<if test="@OGNL@isNotEmpty(addtime)">
+				AND t.ADDTIME = #{addtime}
+			</if>
+			<if test="@OGNL@isNotEmpty(narrowimgurl)">
+				AND t.NARROWIMGURL = #{narrowimgurl}
+			</if>
+			<if test="@OGNL@isNotEmpty(folderid)">
+				AND t.FOLDERID = #{folderid}
+			</if>
+	</sql>
+
+	<select id="getById" parameterType="java.lang.String"
+			resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM BASE_IMGANNEX t
+		WHERE t.IMGANNEXID = #{value}
+	</select>
+
+	<select id="countByParams" parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM BASE_IMGANNEX t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM BASE_IMGANNEX t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<insert id="save" parameterType="com.trade.model.BaseImgannex">
+		INSERT INTO BASE_IMGANNEX(
+		IMGANNEXID ,
+		IMGANNEXTYPE ,
+		COMID ,
+		COMREGID ,
+		IMGANNEXNAME ,
+		IMGANNEXURL ,
+		IMGANNEXSTATUS ,
+		IMGANNEXREMARK ,
+		DATACLASSID ,
+		ADDUSERID ,
+		ADDTIME ,
+		NARROWIMGURL ,
+		FOLDERID 
+		)
+		VALUES (
+		#{imgannexid} ,
+		#{imgannextype} ,
+		#{comid} ,
+		#{comregid} ,
+		#{imgannexname} ,
+		#{imgannexurl} ,
+		#{imgannexstatus} ,
+		#{imgannexremark} ,
+		#{dataclassid} ,
+		#{adduserid} ,
+		#{addtime} ,
+		#{narrowimgurl} ,
+		#{folderid} 
+		)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO BASE_IMGANNEX (
+		IMGANNEXID ,
+		IMGANNEXTYPE ,
+		COMID ,
+		COMREGID ,
+		IMGANNEXNAME ,
+		IMGANNEXURL ,
+		IMGANNEXSTATUS ,
+		IMGANNEXREMARK ,
+		DATACLASSID ,
+		ADDUSERID ,
+		ADDTIME ,
+		NARROWIMGURL ,
+		FOLDERID 
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.imgannexid},
+			#{item.imgannextype},
+			#{item.comid},
+			#{item.comregid},
+			#{item.imgannexname},
+			#{item.imgannexurl},
+			#{item.imgannexstatus},
+			#{item.imgannexremark},
+			#{item.dataclassid},
+			#{item.adduserid},
+			#{item.addtime},
+			#{item.narrowimgurl},
+			#{item.folderid}
+			)
+		</foreach>
+	</insert>
+
+	<update id="updateById" parameterType="com.trade.model.BaseImgannex">
+		UPDATE BASE_IMGANNEX
+		<set>
+			IMGANNEXTYPE =
+			#{imgannextype},
+			COMID =
+			#{comid},
+			COMREGID =
+			#{comregid},
+			IMGANNEXNAME =
+			#{imgannexname},
+			IMGANNEXURL =
+			#{imgannexurl},
+			IMGANNEXSTATUS =
+			#{imgannexstatus},
+			IMGANNEXREMARK =
+			#{imgannexremark},
+			DATACLASSID =
+			#{dataclassid},
+			ADDUSERID =
+			#{adduserid},
+			ADDTIME =
+			#{addtime},
+			NARROWIMGURL =
+			#{narrowimgurl},
+			FOLDERID =
+			#{folderid},
+		</set>
+		WHERE IMGANNEXID =
+		#{imgannexid}
+	</update>
+
+	<update id="updateBySelective" parameterType="com.trade.model.BaseImgannex">
+		UPDATE BASE_IMGANNEX
+		<set>
+			<if test="@OGNL@isNotEmpty(imgannextype)">
+				IMGANNEXTYPE =
+				#{imgannextype},
+			</if>
+			<if test="@OGNL@isNotEmpty(comid)">
+				COMID =
+				#{comid},
+			</if>
+			<if test="@OGNL@isNotEmpty(comregid)">
+				COMREGID =
+				#{comregid},
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexname)">
+				IMGANNEXNAME =
+				#{imgannexname},
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexurl)">
+				IMGANNEXURL =
+				#{imgannexurl},
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexstatus)">
+				IMGANNEXSTATUS =
+				#{imgannexstatus},
+			</if>
+			<if test="@OGNL@isNotEmpty(imgannexremark)">
+				IMGANNEXREMARK =
+				#{imgannexremark},
+			</if>
+			<if test="@OGNL@isNotEmpty(dataclassid)">
+				DATACLASSID =
+				#{dataclassid},
+			</if>
+			<if test="@OGNL@isNotEmpty(adduserid)">
+				ADDUSERID =
+				#{adduserid},
+			</if>
+			<if test="@OGNL@isNotEmpty(addtime)">
+				ADDTIME =
+				#{addtime},
+			</if>
+			<if test="@OGNL@isNotEmpty(narrowimgurl)">
+				NARROWIMGURL =
+				#{narrowimgurl},
+			</if>
+			<if test="@OGNL@isNotEmpty(folderid)">
+				FOLDERID =
+				#{folderid},
+			</if>
+		</set>
+		WHERE IMGANNEXID =
+		#{imgannexid}
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		BASE_IMGANNEX WHERE IMGANNEXID = #{value}
+	</delete>
+
+	<!--保存发票数据-->
+	<insert id="addInvoiceImageProvince" parameterType="map">
+		insert into BASE_IMGANNEX
+		(
+			IMGANNEXID,
+			IMGANNEXTYPE,
+			COMID,
+			COMREGID,
+			IMGANNEXNAME,
+			IMGANNEXURL,
+			NARROWIMGURL,
+			FOLDERID,
+			IMGANNEXSTATUS,
+			ADDUSERID,
+			ADDTIME
+		)
+		select
+			aa.id,
+			aa.image_type,
+			aa.org_id,
+			aa.img_primary_id,
+			file_name,
+			img_original_url,
+			img_thumb_url,
+			folder_id,
+			1 IMGANNEXSTATUS,
+			t.UserID,
+			add_time
+		from SYS_USER T  inner  join
+		<foreach collection="list" item="item" open="(" separator=" union all " close=")">
+			select
+				#{item.ID} id,
+				#{item.imageType} image_type,
+				#{item.orgId} org_id,
+				#{item.imgPrimaryID} img_primary_id,
+				#{item.fileName} file_name,
+				#{item.imgOriginalUrl} img_original_url,
+				#{item.imgThumbUrl} img_thumb_url,
+				#{item.folderId} folder_id,
+				sysdate add_time
+			from dual
+		</foreach> aa  on  aa.org_id=t.orgid
+	</insert>
+</mapper>

@@ -1,11 +1,7 @@
 package com.common.utils;
 
-import com.alibaba.fastjson.JSONObject;
-import com.enums.ResultCode;
-import org.apache.commons.lang.StringUtils;
-
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
 import java.util.regex.Matcher;
 
 public class ValidateUtil {
@@ -30,6 +26,19 @@ public class ValidateUtil {
             return false;
         }
         return true;
+    }
+
+    /**
+     * 验证发票号
+     *
+     * @Title: checkInvoiceId
+     * @param invoiceId
+     * @return boolean
+     */
+    public static boolean checkInvoiceId(String invoiceId) {
+        String regex = "^([A-Za-z0-9]+)|([A-Za-z0-9]+,[A-Za-z0-9]+)$";
+        boolean isRight = match(regex, invoiceId);
+        return isRight;
     }
 
 

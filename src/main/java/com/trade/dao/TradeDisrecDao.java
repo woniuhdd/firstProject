@@ -3,6 +3,7 @@ package com.trade.dao;
 import com.common.dao.GenericDao;
 import com.trade.model.TradeDisrec;
 
+import java.util.List;
 import java.util.Map;
 
 public interface TradeDisrecDao extends GenericDao<TradeDisrec, String> {
@@ -14,4 +15,14 @@ public interface TradeDisrecDao extends GenericDao<TradeDisrec, String> {
     int addInsertDistributeInvoice(Map<String, Object> map);
 
     int updateOrderDetailByDistribute(Map<String, Object> map);
+
+    List<Map<String,Object>> getInvoiceCheckInfo(Map<String, Object> map);
+
+    List<Map<String,Object>>  checkDistributeInvoiceDataByInterface(Map<String, Object> map);
+
+    int deleteOldDistributeInvoice(Map<String, Object> map);
+
+    int updateDistributeInvoiceFlag(Map<String, Object> map);
+
+    int  insertDistributeInvoice(Map<String, Object> map);
 }
