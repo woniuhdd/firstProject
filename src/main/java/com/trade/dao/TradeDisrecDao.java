@@ -2,10 +2,12 @@ package com.trade.dao;
 
 import com.common.dao.GenericDao;
 import com.trade.model.TradeDisrec;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
 
+@Mapper
 public interface TradeDisrecDao extends GenericDao<TradeDisrec, String> {
 
     int addInsertDistributeByDistribute(Map<String, Object> map);

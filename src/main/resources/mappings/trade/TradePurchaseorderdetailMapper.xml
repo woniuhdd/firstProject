@@ -393,7 +393,7 @@
 		nvl(b.comid_ps,'') companyIdPs
 		FROM
 		<foreach collection="detailList" item="item" open="(" separator=" union all " close=")">
-			SELECT #{item.companyDistributeId} company_Distribute_id,#{item.orderdetailid}
+			SELECT #{item.companyDistributeId} company_Distribute_id,#{item.orderDetailId}
 			order_detail_id,#{item.discount} company_distribute_count from dual
 		</foreach>
 		a

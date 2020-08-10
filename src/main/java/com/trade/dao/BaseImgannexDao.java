@@ -2,9 +2,11 @@ package com.trade.dao;
 
 import com.common.dao.GenericDao;
 import com.trade.model.BaseImgannex;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.Map;
 
+@Mapper
 public interface BaseImgannexDao extends GenericDao<BaseImgannex, String> {
 
     /**

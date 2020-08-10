@@ -2,12 +2,12 @@ package com.trade.dao;
 
 import com.common.dao.GenericDao;
 import com.trade.model.TradeInvoicenew;
-import org.springframework.stereotype.Repository;
+import org.apache.ibatis.annotations.Mapper;
 
 import java.util.List;
 import java.util.Map;
 
-@Repository
+@Mapper
 public interface TradeInvoicenewDao extends GenericDao<TradeInvoicenew, String> {
 
     int addInvoiceInfo(List<TradeInvoicenew> list);

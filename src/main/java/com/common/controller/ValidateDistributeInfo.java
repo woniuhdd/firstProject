@@ -183,7 +183,7 @@ public class ValidateDistributeInfo {
             resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
             resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
             validateResult.setJsonObject(resultJsonObj);
-            validateResult.setSuccess(false);
+            validateResult.setSuccess(true);
             return validateResult;
         }else {
             //如果数量与原始记录不一致，则是有重复提交
