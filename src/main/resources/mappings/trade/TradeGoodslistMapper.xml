@@ -32,40 +32,40 @@
 	</sql>
 	
 	<sql id="common_where_if">
-			<if test="@OGNL@isNotEmpty(id)">
+			<if test="@com.OGNL@isNotEmpty(id)">
 				AND t.ID = #{id}
 			</if>
-			<if test="@OGNL@isNotEmpty(batchid)">
+			<if test="@com.OGNL@isNotEmpty(batchid)">
 				AND t.BATCHID = #{batchid}
 			</if>
-			<if test="@OGNL@isNotEmpty(drugvaliditydate)">
+			<if test="@com.OGNL@isNotEmpty(drugvaliditydate)">
 				AND t.DRUGVALIDITYDATE = #{drugvaliditydate}
 			</if>
-			<if test="@OGNL@isNotEmpty(count)">
+			<if test="@com.OGNL@isNotEmpty(count)">
 				AND t.COUNT = #{count}
 			</if>
-			<if test="@OGNL@isNotEmpty(drugid)">
+			<if test="@com.OGNL@isNotEmpty(drugid)">
 				AND t.DRUGID = #{drugid}
 			</if>
-			<if test="@OGNL@isNotEmpty(invoiceid)">
+			<if test="@com.OGNL@isNotEmpty(invoiceid)">
 				AND t.INVOICEID = #{invoiceid}
 			</if>
-			<if test="@OGNL@isNotEmpty(adduserid)">
+			<if test="@com.OGNL@isNotEmpty(adduserid)">
 				AND t.ADDUSERID = #{adduserid}
 			</if>
-			<if test="@OGNL@isNotEmpty(addtime)">
+			<if test="@com.OGNL@isNotEmpty(addtime)">
 				AND t.ADDTIME = #{addtime}
 			</if>
-			<if test="@OGNL@isNotEmpty(changeperson)">
+			<if test="@com.OGNL@isNotEmpty(changeperson)">
 				AND t.CHANGEPERSON = #{changeperson}
 			</if>
-			<if test="@OGNL@isNotEmpty(changereason)">
+			<if test="@com.OGNL@isNotEmpty(changereason)">
 				AND t.CHANGEREASON = #{changereason}
 			</if>
-			<if test="@OGNL@isNotEmpty(changetime)">
+			<if test="@com.OGNL@isNotEmpty(changetime)">
 				AND t.CHANGETIME = #{changetime}
 			</if>
-			<if test="@OGNL@isNotEmpty(drugvaliditydate1)">
+			<if test="@com.OGNL@isNotEmpty(drugvaliditydate1)">
 				AND t.DRUGVALIDITYDATE1 = #{drugvaliditydate1}
 			</if>
 	</sql>
@@ -193,47 +193,47 @@
 	<update id="updateBySelective" parameterType="com.trade.model.TradeGoodslist">
 		UPDATE TRADE_GOODSLIST
 		<set>
-			<if test="@OGNL@isNotEmpty(batchid)">
+			<if test="@com.OGNL@isNotEmpty(batchid)">
 				BATCHID =
 				#{batchid},
 			</if>
-			<if test="@OGNL@isNotEmpty(drugvaliditydate)">
+			<if test="@com.OGNL@isNotEmpty(drugvaliditydate)">
 				DRUGVALIDITYDATE =
 				#{drugvaliditydate},
 			</if>
-			<if test="@OGNL@isNotEmpty(count)">
+			<if test="@com.OGNL@isNotEmpty(count)">
 				COUNT =
 				#{count},
 			</if>
-			<if test="@OGNL@isNotEmpty(drugid)">
+			<if test="@com.OGNL@isNotEmpty(drugid)">
 				DRUGID =
 				#{drugid},
 			</if>
-			<if test="@OGNL@isNotEmpty(invoiceid)">
+			<if test="@com.OGNL@isNotEmpty(invoiceid)">
 				INVOICEID =
 				#{invoiceid},
 			</if>
-			<if test="@OGNL@isNotEmpty(adduserid)">
+			<if test="@com.OGNL@isNotEmpty(adduserid)">
 				ADDUSERID =
 				#{adduserid},
 			</if>
-			<if test="@OGNL@isNotEmpty(addtime)">
+			<if test="@com.OGNL@isNotEmpty(addtime)">
 				ADDTIME =
 				#{addtime},
 			</if>
-			<if test="@OGNL@isNotEmpty(changeperson)">
+			<if test="@com.OGNL@isNotEmpty(changeperson)">
 				CHANGEPERSON =
 				#{changeperson},
 			</if>
-			<if test="@OGNL@isNotEmpty(changereason)">
+			<if test="@com.OGNL@isNotEmpty(changereason)">
 				CHANGEREASON =
 				#{changereason},
 			</if>
-			<if test="@OGNL@isNotEmpty(changetime)">
+			<if test="@com.OGNL@isNotEmpty(changetime)">
 				CHANGETIME =
 				#{changetime},
 			</if>
-			<if test="@OGNL@isNotEmpty(drugvaliditydate1)">
+			<if test="@com.OGNL@isNotEmpty(drugvaliditydate1)">
 				DRUGVALIDITYDATE1 =
 				#{drugvaliditydate1},
 			</if>
