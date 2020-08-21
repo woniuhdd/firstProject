@@ -1107,7 +1107,7 @@ public class CompInterfaceController {
      */
     @RequestMapping(value = "/procurecatalog/getProcurecatalog", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getProcurecatalog(String token, String month, String procurecatalogIds, String currentPageNumber){
+    public JSONObject getProcurecatalog(String token, String month, String procurecatalogIds, String currentPageNumber,String perpage){
         JSONObject resultJsonObj = new JSONObject();
         List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -1164,7 +1164,11 @@ public class CompInterfaceController {
             //4 校验输入参数是否满足配置要求
             page.setPage(Integer.parseInt(currentPageNumber));
             // 每页查询数据量
-            page.setCount(Integer.parseInt(pageSize));
+            if(perpage!=null&&!"".equals(perpage)){
+                page.setCount(Integer.parseInt(perpage));
+            }else{
+                page.setCount(Integer.parseInt(pageSize));
+            }
             page.setOrderby();
             //5.数据库交互
             tradeDruginfoManager.getBaseGoodsList(page);
@@ -1242,7 +1246,7 @@ public class CompInterfaceController {
      */
     @RequestMapping(value = "/company/getCompany", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getCompany(String token, String companyIds, String month, String currentPageNumber){
+    public JSONObject getCompany(String token, String companyIds, String month, String currentPageNumber,String perpage){
         JSONObject resultJsonObj = new JSONObject();
         List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -1299,7 +1303,12 @@ public class CompInterfaceController {
             //3 校验输入参数是否满足配置要求
             page.setPage(Integer.parseInt(currentPageNumber));
             // 每页查询数据量
-            page.setCount(Integer.parseInt(pageSize));
+            if(perpage!=null&&!"".equals(perpage)){
+                page.setCount(Integer.parseInt(perpage));
+            }else{
+                page.setCount(Integer.parseInt(pageSize));
+            }
+
             //  排序字段
             page.setSidx("lastUpdateTime,companyid");
             // 排序方向
@@ -1368,7 +1377,7 @@ public class CompInterfaceController {
      */
     @RequestMapping(value = "/hospital/getHospital", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getHospital(String token, String hospitalIds, String month, String currentPageNumber){
+    public JSONObject getHospital(String token, String hospitalIds, String month, String currentPageNumber ,String perpage){
         JSONObject resultJsonObj = new JSONObject();
         List<Map<String, Object>> dataList = new ArrayList<Map<String, Object>>();
         Map<String, Object> resultMap = new HashMap<String, Object>();
@@ -1426,7 +1435,11 @@ public class CompInterfaceController {
             //4 校验输入参数是否满足配置要求
             page.setPage(Integer.parseInt(currentPageNumber));
             // 每页查询数据量
-            page.setCount(Integer.parseInt(pageSize));
+            if(perpage!=null&&!"".equals(perpage)){
+                page.setCount(Integer.parseInt(perpage));
+            }else{
+                page.setCount(Integer.parseInt(pageSize));
+            }
             //  排序字段
             page.setSidx("lastUpdateTime,hospitalcode");
             // 排序方向
