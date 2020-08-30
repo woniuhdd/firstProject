@@ -73,7 +73,7 @@ public class CompInterfaceController {
 
         //验证参数是否为空
         if (StringUtils.isEmpty(token) || StringUtils.isEmpty(startTime)
-                || StringUtils.isEmpty(endTime) || StringUtils.isEmpty(currentPageNumber) ){
+                || StringUtils.isEmpty(endTime) || StringUtils.isEmpty(currentPageNumber)){
             resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
             resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
             dataList.add(resultMap);
@@ -129,16 +129,16 @@ public class CompInterfaceController {
             paramsMap.put("delCompCode", orgId);
             page.setConditions(paramsMap);
             page.setPage(Integer.parseInt(currentPageNumber));
-            page.setCount(Integer.parseInt(pageSize) );// 每页查询数据量
+            page.setCount(Integer.parseInt(pageSize));// 每页查询数据量
             tradePurchaseorderdetailManager.queryAllOrderDetailRecentForInterface(page);
 
             SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            List<TradePurchaseorderdetail> tradePurchaseorderdetailList = (List<TradePurchaseorderdetail>) page.getRows();
+            Page<TradePurchaseorderdetail> tradePurchaseorderdetailList = (Page<TradePurchaseorderdetail>) page.getRows();
             if (tradePurchaseorderdetailList != null && tradePurchaseorderdetailList.size() > 0) {
                 for (TradePurchaseorderdetail item : tradePurchaseorderdetailList) {
                     Map dataMap = new HashMap();
                     dataMap.put("orderId", item.getPurchaseorderid());
-                    dataMap.put("orderName", item.getPurchaseordercode());
+                    dataMap.put("orderCode", item.getPurchaseordercode());
                     dataMap.put("orderRemarks", item.getRemark());
                     dataMap.put("orderDetailId", item.getPurchaseorderdetailid());
                     dataMap.put("hospitalId", item.getHosid());
@@ -159,9 +159,9 @@ public class CompInterfaceController {
             resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
             resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
             resultJsonObj.put("dataList", dataList);
-            resultJsonObj.put("currentPageNumber", page.getPage());// 按照数据返回正确的页码
-            resultJsonObj.put("totalPageCount", page.getTotal());
-            resultJsonObj.put("totalRecordCount", page.getRecords());
+            resultJsonObj.put("currentPageNumber", tradePurchaseorderdetailList.getPageNum());// 按照数据返回正确的页码
+            resultJsonObj.put("totalPageCount", tradePurchaseorderdetailList.getPages());
+            resultJsonObj.put("totalRecordCount", tradePurchaseorderdetailList.getTotal());
             return resultJsonObj;
         } catch (Exception e) {
             log.error("Failed to getOrder", e);
@@ -1076,6 +1076,11 @@ public class CompInterfaceController {
             map.put("invoiceList", nowValidateResult.getDistributeInfoList());
             map.put("userId", tokenMap.get("userId").toString());
             map.put("userName", tokenMap.get("userName").toString());
+            for (Map<String, Object> check : checkList) {
+                JSONObject detailMap = new JSONObject();
+                detailMap.put("companyDistributeId", check.get("COMPANYDISTRIBUTEID"));
+                successList.add(detailMap);
+            }
             //与数据库交互
             //省平台直接交换，
             int num = tradeDisrecManager.addInvoiceDistributeData(map);
