@@ -10,6 +10,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -20,6 +21,8 @@ public class ValidateToken {
     private ValidateUser validateUser;
     @Autowired
     private SysUserManager sysUserManager;
+    @Autowired
+    private HttpServletRequest request;
 
     public Map<String, Object> validateToken(String token) {
         Map<String, Object> map = new HashMap<>();
@@ -60,6 +63,11 @@ public class ValidateToken {
             map.put("resultMsg", userMap.get("resultMsg"));
             return map;
         }
+
+        //验证是否有接口访问权限
+        String url = request.getServletPath();
+
+
         SysUser sysUser = sysUserManager.getUserByUsername(username);
         map.put("orgId",sysUser.getOrgid());
         map.put("userId", sysUser.getUserid());
