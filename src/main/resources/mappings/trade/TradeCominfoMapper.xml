@@ -1491,7 +1491,7 @@
 				AND t.COMPANYID in(
 				<foreach collection="companyid" item="item" index="index"
 						 separator=",">
-					#{item}
+					#{item.companyid}
 				</foreach>)
 			</if>
 			<if test="@com.OGNL@isNotEmpty(startTime)">

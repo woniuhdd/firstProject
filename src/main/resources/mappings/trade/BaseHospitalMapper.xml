@@ -871,11 +871,10 @@
 		LEFT JOIN SYS_AREA a on t.AREAID=a.AREAID
 		<where>
 			<if test="@com.OGNL@isNotEmpty(hospitalId)">
-				AND t.HOSPITALCODE in(
-				<foreach collection="hospitalId" item="item" index="index"
-						 separator=",">
-					#{item}
-				</foreach>)
+				AND t.HOSPITALCODE in
+				<foreach collection="hospitalId" item="item" separator="," open="(" close=")">
+					#{item.hospitalId}
+				</foreach>
 			</if>
 			<if test="@com.OGNL@isNotEmpty(startTime)">
 				AND c.LASTUPDATETIME &gt;= TO_DATE(#{startTime}, 'yyyy-mm-dd hh24:mi:ss')

@@ -3,7 +3,9 @@ package com.common.controller;
 import com.common.utils.Base64Util;
 import com.common.utils.JwtTokenUtil;
 import com.enums.ResultCode;
+import com.sys.model.SysInterfacePrivilege;
 import com.sys.model.SysUser;
+import com.sys.service.SysInterfacePrivilegeManager;
 import com.sys.service.SysUserManager;
 import io.jsonwebtoken.Claims;
 import org.apache.commons.lang.StringUtils;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -21,6 +24,8 @@ public class ValidateToken {
     private ValidateUser validateUser;
     @Autowired
     private SysUserManager sysUserManager;
+    @Autowired
+    private SysInterfacePrivilegeManager sysInterfacePrivilegeManager;
     @Autowired
     private HttpServletRequest request;
 
@@ -63,12 +68,27 @@ public class ValidateToken {
             map.put("resultMsg", userMap.get("resultMsg"));
             return map;
         }
+        SysUser sysUser = sysUserManager.getUserByUsername(username);
 
         //验证是否有接口访问权限
-        String url = request.getServletPath();
+        String urlPath = request.getServletPath();
+        Map<String ,Object> params = new HashMap<>();
+        params.put("orgId",sysUser.getOrgid());
+        params.put("urlPath",urlPath);
+        List<SysInterfacePrivilege> sysInterfacePrivilegeList = sysInterfacePrivilegeManager.getListByParams(params);
+        if (sysInterfacePrivilegeList.size() != 1){
+            map.put("resultCode", ResultCode.PERMISSION_UNAUTHORISE.getCode());
+            map.put("resultMsg", ResultCode.PERMISSION_UNAUTHORISE.getMessage());
+            return map;
+        }else {
+            if ("0".equals(sysInterfacePrivilegeList.get(0).getIsUsing())){
+                map.put("resultCode", ResultCode.PERMISSION_UNAUTHORISE.getCode());
+                map.put("resultMsg", ResultCode.PERMISSION_UNAUTHORISE.getMessage());
+                return map;
+            }
+        }
 
 
-        SysUser sysUser = sysUserManager.getUserByUsername(username);
         map.put("orgId",sysUser.getOrgid());
         map.put("userId", sysUser.getUserid());
         map.put("userName", sysUser.getUsername());

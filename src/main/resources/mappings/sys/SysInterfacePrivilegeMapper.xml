@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sys.dao.SysInterfacePrivilegeDao">
+	<resultMap type="com.sys.model.SysInterfacePrivilege" id="BaseResultMap">
+		<result property="interfacePrivilegeId" column="INTERFACE_PRIVILEGE_ID" javaType="String" />
+		<result property="orgId" column="ORG_ID" javaType="String" />
+		<result property="orgName" column="ORG_NAME" javaType="String" />
+		<result property="urlPath" column="URL_PATH" javaType="String" />
+		<result property="interfaceName" column="INTERFACE_NAME" javaType="String" />
+		<result property="isUsing" column="IS_USING" javaType="String" />
+	</resultMap>
+
+	<sql id="full-columns">
+		t.INTERFACE_PRIVILEGE_ID,
+		t.ORG_ID,
+		t.ORG_NAME,
+		t.URL_PATH,
+		t.INTERFACE_NAME,
+		t.IS_USING
+	</sql>
+	
+	<sql id="common_where_if">
+			<if test="@com.OGNL@isNotEmpty(interfacePrivilegeId)">
+				AND t.INTERFACE_PRIVILEGE_ID = #{interfacePrivilegeId}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(orgId)">
+				AND t.ORG_ID = #{orgId}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(orgName)">
+				AND t.ORG_NAME = #{orgName}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(urlPath)">
+				AND t.URL_PATH = #{urlPath}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(interfaceName)">
+				AND t.INTERFACE_NAME = #{interfaceName}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(isUsing)">
+				AND t.IS_USING = #{isUsing}
+			</if>
+	</sql>
+
+	<insert id="save" parameterType="com.sys.model.SysInterfacePrivilege">
+		INSERT INTO SYS_INTERFACE_PRIVILEGE(
+		INTERFACE_PRIVILEGE_ID ,
+		ORG_ID ,
+		ORG_NAME ,
+		URL_PATH ,
+		INTERFACE_NAME ,
+		IS_USING 
+		)
+		VALUES (
+		#{interfacePrivilegeId} ,
+		#{orgId} ,
+		#{orgName} ,
+		#{urlPath} ,
+		#{interfaceName} ,
+		#{isUsing} 
+		)
+	</insert>
+
+	<insert id="saveBatch" parameterType="java.util.List">
+		INSERT INTO SYS_INTERFACE_PRIVILEGE (
+		INTERFACE_PRIVILEGE_ID ,
+		ORG_ID ,
+		ORG_NAME ,
+		URL_PATH ,
+		INTERFACE_NAME ,
+		IS_USING 
+		) VALUES
+		<foreach collection="list" item="item" index="index"
+			separator=",">
+			(
+			#{item.interfacePrivilegeId},
+			#{item.orgId},
+			#{item.orgName},
+			#{item.urlPath},
+			#{item.interfaceName},
+			#{item.isUsing}
+			)
+		</foreach>
+	</insert>
+
+	<select id="getById" parameterType="java.lang.String"
+		resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM SYS_INTERFACE_PRIVILEGE t
+		WHERE t.INTERFACE_PRIVILEGE_ID = #{value}
+	</select>
+
+	<select id="getListByParams" parameterType="map" resultMap="BaseResultMap">
+		SELECT
+		<include refid="full-columns" />
+		FROM SYS_INTERFACE_PRIVILEGE t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<select id="countByParams" parameterType="map" resultType="int">
+		SELECT count(*)
+		FROM SYS_INTERFACE_PRIVILEGE t
+		<where>
+			<include refid="common_where_if"/>
+		</where>
+	</select>
+
+	<update id="updateById" parameterType="com.sys.model.SysInterfacePrivilege">
+		UPDATE SYS_INTERFACE_PRIVILEGE
+		<set>
+			ORG_ID =
+			#{orgId},
+			ORG_NAME =
+			#{orgName},
+			URL_PATH =
+			#{urlPath},
+			INTERFACE_NAME =
+			#{interfaceName},
+			IS_USING =
+			#{isUsing},
+		</set>
+		WHERE INTERFACE_PRIVILEGE_ID =
+		#{interfacePrivilegeId}
+	</update>
+
+	<update id="updateBySelective" parameterType="com.sys.model.SysInterfacePrivilege">
+		UPDATE SYS_INTERFACE_PRIVILEGE
+		<set>
+			<if test="@com.OGNL@isNotEmpty(orgId)">
+				ORG_ID =
+				#{orgId},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(orgName)">
+				ORG_NAME =
+				#{orgName},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(urlPath)">
+				URL_PATH =
+				#{urlPath},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(interfaceName)">
+				INTERFACE_NAME =
+				#{interfaceName},
+			</if>
+			<if test="@com.OGNL@isNotEmpty(isUsing)">
+				IS_USING =
+				#{isUsing},
+			</if>
+		</set>
+		WHERE INTERFACE_PRIVILEGE_ID =
+		#{interfacePrivilegeId}
+	</update>
+
+	<delete id="deleteById" parameterType="java.lang.String">
+		DELETE FROM
+		SYS_INTERFACE_PRIVILEGE WHERE INTERFACE_PRIVILEGE_ID = #{value}
+	</delete>
+</mapper>
