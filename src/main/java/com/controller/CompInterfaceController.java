@@ -1470,8 +1470,8 @@ public class CompInterfaceController {
                     retMap.put("areaId", baseHospital.getAreaid());
                     retMap.put("areaName", baseHospital.getAreaName());
                     retMap.put("isUsing", baseHospital.getIsusing());
-                    retMap.put("addTime", baseHospital.getAddtime() == null ? "" : DateFormatUtils.format(baseHospital.getAddtime(), "yyyy-MM-dd"));
-                    retMap.put("lastUpdateTime", baseHospital.getLastUpdateTime()== null ? "" : DateFormatUtils.format(baseHospital.getLastUpdateTime(), "yyyy-MM-dd"));
+                    retMap.put("addTime", baseHospital.getAddtime() == null ? "" : DateFormatUtils.format(baseHospital.getAddtime(), "yyyy-MM-dd HH:mm:ss"));
+                    retMap.put("lastUpdateTime", baseHospital.getLastUpdateTime()== null ? "" : DateFormatUtils.format(baseHospital.getLastUpdateTime(), "yyyy-MM-dd HH:mm:ss"));
                     dataList.add(retMap);
                 }
                 resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
@@ -1485,13 +1485,13 @@ public class CompInterfaceController {
             resultJsonObj.put("currentPageNumber", cur);
             //总行数
             resultJsonObj.put("totalRecordCount", total);
-            resultJsonObj.put("hospInfList", dataList);
+            resultJsonObj.put("dataList", dataList);
         } catch (Exception e) {
             log.error("Failed to getHospital", e);
             resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
             resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
             resultJsonObj.put("totalPageCount", "");
-            resultJsonObj.put("hospInfList", dataList);
+            resultJsonObj.put("dataList", dataList);
             return resultJsonObj;
         }
         return resultJsonObj;
