@@ -1221,7 +1221,7 @@ public class CompInterfaceController {
             } else {
                 resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage() + ResultCode.PARAM_IS_BLANK.getMessage());
             }
-            resultJsonObj.put("ResultCode", ResultCode.SUCCESS.getCode());
+            resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
             //总页数
             resultJsonObj.put("totalPageCount", totalPages);
             //当前页码
@@ -1231,7 +1231,7 @@ public class CompInterfaceController {
             resultJsonObj.put("dataList", dataList);
         } catch (Exception e) {
             log.error("Failed to getCompany", e);
-            resultJsonObj.put("ResultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
             resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage() + "【获取数据错误，请联系管理员】" + "【异常信息：" + e.getMessage() + "】");
             resultJsonObj.put("totalPageCount", "");
             resultJsonObj.put("dataList", dataList);
