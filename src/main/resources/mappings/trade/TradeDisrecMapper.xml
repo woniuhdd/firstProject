@@ -404,7 +404,7 @@
 		FROM TRADE_PURCHASEORDERDETAIL a INNER JOIN
 		<foreach collection="distributeList" item="distribute" open="(" separator=" union all " close=")">
 			select
-			#{distribute.distributeId} distribute_id,#{distribute.orderdetailid}
+			#{distribute.distributeId} distribute_id,#{distribute.orderDetailId}
 			order_detail_id,#{distribute.discount} distribute_count,#{distribute.disTime} dis_time from dual
 		</foreach>
 		b on b.order_detail_id = a.PURCHASEORDERDETAILID
@@ -454,7 +454,7 @@
 		WHERE PURCHASEORDERDETAILID IN(select order_detail_id from
 		<foreach collection="distributeList" item="distribute" open="(" separator=" union all " close=")">
 			select
-			#{distribute.orderdetailid}
+			#{distribute.orderDetailId}
 			order_detail_id from dual
 		</foreach>)
 	</update>
