@@ -861,10 +861,10 @@ public class CompInterfaceController {
                 for (Map<String, Object> detail : details) {
                     JSONObject returnMap = new JSONObject(16);
                     returnMap.put("distributeId", detail.get("DISRECID"));
-                    returnMap.put("invoicePrimaryKeyId", detail.get("INVOICEPRIMARYKEYID"));
+                    returnMap.put("invoicePrimaryId", detail.get("INVOICEPRIMARYKEYID"));
                     returnMap.put("invoiceId", detail.get("INVOICEID"));
                     returnMap.put("invoiceCode", detail.get("INVOICECODE"));
-                    returnMap.put("comid_ps", detail.get("COMID_PS"));
+                    returnMap.put("comidPs", detail.get("COMID_PS"));
                     returnMap.put("checkResult", detail.get("FLAGLOG"));
                     returnMap.put("submittime", detail.get("SUBMITTIME"));
                     successList.add(returnMap);
