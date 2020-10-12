@@ -242,7 +242,7 @@ public class CompInterfaceController {
                 if (isExists.equals("0")) {
                     JSONObject errorMap = new JSONObject();
                     errorMap.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
-                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage());
+                    errorMap.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage()+"【订单明细不存在】");
                     errorReasonList.add(errorMap);
                 } else if (isCanDistribute.equals("0")) {   //数据状态不符合
                     JSONObject errorMap = new JSONObject();

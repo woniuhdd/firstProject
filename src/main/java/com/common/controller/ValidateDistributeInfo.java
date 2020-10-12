@@ -31,7 +31,7 @@ public class ValidateDistributeInfo {
             JSONArray batchList = (JSONArray) distributeInfomap.get("list");
             if (batchList == null || batchList.size() == 0) {
                 resultJsonObj.put("resultCode", ResultCode.PARAM_NOT_COMPLETE.getCode());
-                resultJsonObj.put("resultMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage()+ "【批次信息不能为空】");
                 validateResult.setJsonObject(resultJsonObj);
                 validateResult.setSuccess(false);
                 return validateResult;
@@ -40,7 +40,7 @@ public class ValidateDistributeInfo {
             List<DistributeInfo> distributeInfoList = JSONObject.parseArray(JSONObject.parseObject(distributeInfo).getString("list"), DistributeInfo.class);
             if (distributeInfoList == null || distributeInfoList.size() == 0) {
                 resultJsonObj.put("resultCode", ResultCode.PARAM_NOT_COMPLETE.getCode());
-                resultJsonObj.put("resultMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage());
+                resultJsonObj.put("resultMsg", ResultCode.PARAM_NOT_COMPLETE.getMessage()+ "【配送信息不能为空】");
                 validateResult.setJsonObject(resultJsonObj);
                 validateResult.setSuccess(false);
                 return validateResult;
@@ -75,7 +75,7 @@ public class ValidateDistributeInfo {
                 } else {
                     if (!ValidateUtil.checkDate(distributeInfoTemp.getDisTime()) ) {
                         map.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
-                        map.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage()+ "【配送日期不能为空】");
+                        map.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage()+ "【配送日期格式不正确】");
                         errorListTemp.add(map);
                     }
                 }
@@ -114,7 +114,7 @@ public class ValidateDistributeInfo {
                             totalDisCount += disBatch.getBatchcount();
                         } else {
                             map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                            map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送数量不能为0】");
+                            map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送数量不能为空】");
                             errorListTemp.add(map);
                         }
                     }
