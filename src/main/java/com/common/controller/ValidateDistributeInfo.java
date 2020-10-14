@@ -23,7 +23,7 @@ public class ValidateDistributeInfo {
 
         JSONObject resultJsonObj = new JSONObject();
         List<Map<String, Object>> errorList = new ArrayList<Map<String, Object>>();
-        Map<String, Object> map = new HashMap<>();
+
 
         try {
             Map<String, Object> distributeInfomap = (Map<String, Object>) JSON.parseObject(distributeInfo, Map.class);
@@ -53,37 +53,38 @@ public class ValidateDistributeInfo {
                 int totalDisCount = 0;
                 JSONObject JsonObjTemp = new JSONObject();
                 List<Map<String, Object>> errorListTemp = new ArrayList<Map<String, Object>>();
+                Map<String, Object> map = new HashMap<>();
                 //判断企业的配送明细编号是否为空
                 if (StringUtils.isEmpty(distributeInfoTemp.getCompanyDistributeId())) {
-                    map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                    map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【企业配送明细编号不能为空】");
+                    map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                    map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【企业配送明细编号不能为空】");
                     errorListTemp.add(map);
                 }
 
                 //订单明细编号orderDetailId
                 if (StringUtils.isEmpty(distributeInfoTemp.getOrderDetailId())) {
-                    map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                    map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【订单明细编号不能为空】");
+                    map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                    map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【订单明细编号不能为空】");
                     errorListTemp.add(map);
                 }
 
                 //配送日期disTime
                 if (StringUtils.isEmpty(distributeInfoTemp.getDisTime())) {
-                    map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                    map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送日期不能为空】");
+                    map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                    map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送日期不能为空】");
                     errorListTemp.add(map);
                 } else {
                     if (!ValidateUtil.checkDate(distributeInfoTemp.getDisTime()) ) {
-                        map.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
-                        map.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage()+ "【配送日期格式不正确】");
+                        map.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+                        map.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage()+ "【配送日期格式不正确】");
                         errorListTemp.add(map);
                     }
                 }
 
                 //判断批号
                 if (distributeInfoTemp.getBatchList() == null || distributeInfoTemp.getBatchList().size() <= 0) {
-                    map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                    map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【企业配送批号不能为空】");
+                    map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                    map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【企业配送批号不能为空】");
                     errorListTemp.add(map);
                 }else {
 
@@ -93,32 +94,39 @@ public class ValidateDistributeInfo {
                     for (DisBatch disBatch : disBatchList){
                         //判断批号是否重复
                         if (StringUtils.isEmpty(disBatch.getBatchcode())) {
-                            map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                            map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【批号不能空】");
+                            map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                            map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【批号不能空】");
                             errorListTemp.add(map);
                         }else if (withOutBatchInfo.contains(disBatch.getBatchcode())) {
-                            map.put("resultCode", ResultCode.PARAM_IS_INVALID.getCode());
-                            map.put("resultMsg", ResultCode.PARAM_IS_INVALID.getMessage()+ "【批号重复】");
+                            map.put("errorCode", ResultCode.PARAM_IS_INVALID.getCode());
+                            map.put("errorMsg", ResultCode.PARAM_IS_INVALID.getMessage()+ "【批号重复】");
                             errorListTemp.add(map);
                         } else {
                             withOutBatchInfo.add(disBatch.getBatchcode());
                         }
 
                         //判断配送数量
-                        if (StringUtils.isNotEmpty(disBatch.getBatchcount().toString())) {// 配送数量格式校验
+                        if (disBatch.getBatchcount() == null){
+                            map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                            map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送数量不能为空】");
+                            errorListTemp.add(map);
+                        }else {
+                            // 配送数量格式校验
                             if (!ValidateUtil.checkCount(disBatch.getBatchcount().toString())) {
-                                map.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
-                                map.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage()+ "【配送数量不能转为整数或者配送数量为0】");
+                                map.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+                                map.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage()+ "【配送数量不能转为整数或者配送数量为0】");
                                 errorListTemp.add(map);
                             }
                             totalDisCount += disBatch.getBatchcount();
-                        } else {
-                            map.put("resultCode", ResultCode.PARAM_IS_BLANK.getCode());
-                            map.put("resultMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送数量不能为空】");
-                            errorListTemp.add(map);
                         }
                     }
                 }
+                if (distributeInfoTemp.getDiscount() != totalDisCount){
+                    map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+                    map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【配送表与配送批次表数量不一致】");
+                    errorListTemp.add(map);
+                }
+
 
                 if (errorListTemp != null && errorListTemp.size() > 0) {
                     JsonObjTemp.put("companyDistributeId", distributeInfoTemp.getCompanyDistributeId());
@@ -131,8 +139,8 @@ public class ValidateDistributeInfo {
             }
             //如果错误集合数量大于0 ，则提示验证失败
             if (errorList.size() > 0) {
-                resultJsonObj.put("resultCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
-                resultJsonObj.put("resultMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+                resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
                 resultJsonObj.put("errorList", errorList);
                 validateResult.setSuccess(false);
                 validateResult.setJsonObject(resultJsonObj);
@@ -187,8 +195,8 @@ public class ValidateDistributeInfo {
             return validateResult;
         }else {
             //如果数量与原始记录不一致，则是有重复提交
-            resultJsonObj.put("resultCode", ResultCode.PARAM_IS_INVALID.getCode());
-            resultJsonObj.put("resultMsg", ResultCode.PARAM_IS_INVALID.getMessage());
+            resultJsonObj.put("resultCode", ResultCode.FAIL.getCode());
+            resultJsonObj.put("resultMsg", ResultCode.FAIL.getMessage());
             validateResult.setJsonObject(resultJsonObj);
             validateResult.setSuccess(false);
             return validateResult;
