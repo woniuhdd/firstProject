@@ -124,7 +124,11 @@ public class CompInterfaceController {
             paramsMap.put("endTime", endDate);
             paramsMap.put("orderStatuses", 2);
 
-            List<String> orgId = sysDatainterfaceOrganizationManager.getData((String) map.get("orgId"));
+            //先不考虑配送企业集团数据
+//            List<String> orgId = sysDatainterfaceOrganizationManager.getData((String) map.get("orgId"));
+
+            List<String> orgId = new ArrayList<>();
+            orgId.add((String) map.get("orgId"));
 
             paramsMap.put("delCompCode", orgId);
             page.setConditions(paramsMap);
