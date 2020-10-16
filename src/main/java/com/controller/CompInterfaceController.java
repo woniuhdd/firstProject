@@ -1,13 +1,11 @@
 package com.controller;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.common.controller.ValidateDistributeInfo;
 import com.common.controller.ValidateToken;
-import com.common.utils.Pagination;
-import com.common.utils.ToolUtils;
-import com.common.utils.ValidateInterface;
-import com.common.utils.ValidateUtil;
+import com.common.utils.*;
 import com.enums.OrderDetailStatus;
 import com.enums.ResultCode;
 import com.github.pagehelper.Page;
@@ -26,6 +24,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.net.URLDecoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -57,6 +56,12 @@ public class CompInterfaceController {
     private TradeDruginfoManager tradeDruginfoManager;
     @Value("${page.size}")
     private String pageSize;
+    @Value("${com.uploadImg.url}")
+    private String invoiceImgUploadUrl;
+    @Value("${com.uploadImg.token}")
+    private String invoiceImgUploadToken;
+
+
 
     /**
      * 内容摘要：获取采购订单数据
@@ -567,6 +572,12 @@ public class CompInterfaceController {
             }else{
                 item.setImgPrimaryID(item.getImageType().equals("0")?tradeInvoicenew.getInvoiceimgid():tradeInvoicenew.getInvoiceimgid2());
             }
+            if (!ImageRequestUtil.isNetFileAvailable(item.getImgUrl())) {
+                Map<String, Object> errorReasonMap = new HashMap<>(16);
+                errorReasonMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
+                errorReasonMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getMessage() + "【图片路径不可访问】");
+                errorReasonList.add(errorReasonMap);
+            }
             if (errorReasonList.size() > 0) {
                 returnMap.put("companyPrimaryKey", item.getCompanyPrimaryKey());
                 returnMap.put("errorReasonList", errorReasonList);
@@ -582,15 +593,20 @@ public class CompInterfaceController {
         try {
             List<Map<String, Object>> checkList = new ArrayList<>();
             for (ComInterfaceImage item : invoiceImgLst) {
+                //获取图片数据流
+                JSONObject jsonImg = uploadInvoiceImag(item.getImgUrl(), item.getImageType(), tokenMap.get("orgId").toString());
+                if (!jsonImg.get("returnCode").toString().equals("1")) {
+                    return jsonImg;
+                }
                 Map<String, Object> imgs = new HashMap<>(16);
                 imgs.put("companyPrimaryKey", item.getCompanyPrimaryKey());
                 imgs.put("ID", ToolUtils.getPrimaryId("2"));
                 imgs.put("imgPrimaryID", item.getImgPrimaryID());
                 imgs.put("invoicePrimaryID", item.getInvoicePrimaryID());
                 imgs.put("imageType", item.getImageType().equals("0") ? "9" : "10");
-                imgs.put("fileName", "发票图片(接口)");
-                imgs.put("imgOriginalUrl", item.getImgUrl());
-                imgs.put("imgThumbUrl", item.getImgUrl());
+                imgs.put("fileName", jsonImg.get("fileName".toString()));
+                imgs.put("imgOriginalUrl", jsonImg.get("returnurl").toString().replaceAll("\\\\", "/"));
+                imgs.put("imgThumbUrl", jsonImg.get("returnthumburl").toString().replaceAll("\\\\", "/"));
                 //随货单图片(接口)   77B4A1B9DB4301D0E053C0A8757101D0
                 //发票图片(接口)      77B4A1B9DB4201D0E053C0A8757101D0
                 imgs.put("folderId", item.getImageType().equals("0") ? "77B4A1B9DB4201D0E053C0A8757101D0" : "77B4A1B9DB4301D0E053C0A8757101D0");
@@ -601,6 +617,7 @@ public class CompInterfaceController {
                 detailMap.put("companyPrimaryKey", item.getCompanyPrimaryKey());
                 detailMap.put("ID", imgs.get("ID"));
                 successList.add(detailMap);
+
             }
             //4、数据操作
             Map<String, Object> params = new HashMap<String, Object>();
@@ -623,6 +640,54 @@ public class CompInterfaceController {
         }
         return resultJsonObj;
 
+    }
+
+    /**
+     * 内网跨服务器保存上载保存图片
+     *
+     * @param imgUrl
+     * @param imagType 1 发票  2 随货清单
+     * @param orgID
+     * @return
+     */
+    private JSONObject uploadInvoiceImag(String imgUrl, String imagType, String orgID) {
+        JSONObject resultMap = new JSONObject();
+        String url = invoiceImgUploadUrl;
+        Map<String, String> textMap = new HashMap<String, String>();
+        //可以设置多个input的name，value
+        textMap.put("userid", orgID);
+        textMap.put("imgType", imagType.equals("0") ? "1" : "2");
+        textMap.put("usertoken", invoiceImgUploadToken);
+        //设置file的name，路径
+        Map<String, String> fileMap = new HashMap<String, String>();
+        fileMap.put("file", imgUrl);
+        String contentType = "";//image/png
+        String ret = ImageRequestUtil.formUpload(url, textMap, fileMap, contentType);
+        try {
+            String resultStr = URLDecoder.decode(ret.toString(), "UTF-8");
+//            resultStr.replaceAll("\\","\\\\");
+            JSONObject map = JSON.parseObject(resultStr);
+            String result = map.getString("result").toLowerCase();
+            String errMessage = map.getString("errMessage");
+            if (result.equals("false")) {
+                resultMap.put("resultCode", ResultCode.FAIL.getCode());
+                resultMap.put("resultMsg", ResultCode.FAIL.getMessage() + "【" + errMessage + "】");
+                return resultMap;
+            }
+            String returnurl = URLDecoder.decode(map.get("returnurl").toString(), "UTF-8");
+            String returnthumburl = URLDecoder.decode(map.get("returnthumburl").toString(), "UTF-8");
+            String fileName = map.get("fileName").toString();
+            resultMap.put("resultCode",  ResultCode.SUCCESS.getCode());
+            resultMap.put("resultMsg", ResultCode.SUCCESS.getMessage());
+            resultMap.put("returnurl", returnurl);
+            resultMap.put("returnthumburl", returnthumburl);
+            resultMap.put("fileName", fileName);
+        } catch (Exception ex) {
+            resultMap.put("resultCode",  ResultCode.FAIL.getCode());
+            resultMap.put("resultMsg", ResultCode.FAIL.getMessage() + "【保存图片出错：" + ex.getMessage() + "】");
+            return resultMap;//直接返回
+        }
+        return resultMap;
     }
 
     /**
