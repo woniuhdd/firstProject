@@ -862,7 +862,7 @@ public class CompInterfaceController {
      */
     @RequestMapping(value = "/distribution/invoiceInfo", method = {RequestMethod.POST})
     @ResponseBody
-    public JSONObject getInvoiceCheckInfo(String token, String startTime, String endTime, String currentPageNumber){
+    public JSONObject getInvoiceCheckInfo(String token, String startTime, String endTime, String currentPageNumber,String perpage){
 
         JSONObject resultJsonObj = new JSONObject();
         List<Map<String, Object>> successList = new ArrayList<Map<String, Object>>();
@@ -870,8 +870,7 @@ public class CompInterfaceController {
         Map<String, Object> resultMap = new HashMap<String, Object>();
 
         //验证参数是否为空
-        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(startTime)
-                || StringUtils.isEmpty(endTime) || StringUtils.isEmpty(currentPageNumber) ){
+        if (StringUtils.isEmpty(token) || StringUtils.isEmpty(currentPageNumber) ){
             resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
             resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage());
             errorList.add(resultMap);
@@ -893,7 +892,7 @@ public class CompInterfaceController {
             errorList.add(resultMap);
         }
         //2.时间格式是否正确
-        if (!ValidateUtil.checkDate(startTime) || !ValidateUtil.checkDate(endTime) ){
+        if (startTime!=null&&endTime!=null&&(!ValidateUtil.checkDate(startTime) || !ValidateUtil.checkDate(endTime) )){
             resultMap.put("errorCode", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
             resultMap.put("errorMsg", ResultCode.PARAM_TYPE_BIND_ERROR.getCode());
             errorList.add(resultMap);
@@ -912,12 +911,19 @@ public class CompInterfaceController {
         try {
             Pagination page = new Pagination();
             Map<String, Object> paramsMap = new HashMap<String, Object>();
-            paramsMap.put("startTime", startTime);
-            paramsMap.put("endTime", endTime);
+            if (startTime!=null&&endTime!=null){
+                paramsMap.put("startTime", startTime);
+                paramsMap.put("endTime", endTime);
+            }
             paramsMap.put("companyIdPs", tokenMap.get("orgId").toString());
             page.setConditions(paramsMap);
             page.setPage(Integer.parseInt(currentPageNumber));
-            page.setCount(Integer.parseInt(pageSize));// 每页查询数据量
+            // 每页查询数据量
+            if(perpage!=null&&!"".equals(perpage)){
+                page.setCount(Integer.parseInt(perpage));
+            }else{
+                page.setCount(Integer.parseInt(pageSize));
+            }
             page.setOrderby();
             //数据库交换
             tradeDisrecManager.getVerificationInvoiceResultList(page);

@@ -521,31 +521,37 @@
 	</update>
 
 	<select id="getInvoiceCheckInfo" parameterType="map" resultType="hashmap">
-		select t.disrecid,
-		b.invoiceid invoicePrimaryKeyId,
-		c.invoiceid invoiceCode,
-		c.invoicecode invoiceId,
-		d.comid_ps,
-		b.flaglog,
-		to_char(p.submittime,'yyyy-mm-dd') submittime
-		from Trade_Disrec t
-		inner join temp_result b
-		on b.disrecid = t.disrecid
-		inner join trade_invoicenew c
-		on c.id = b.invoiceid
-		inner  join trade_purchaseorderdetail d on d.purchaseorderdetailid=t.purchaseorderdetailid
-		INNER JOIN TRADE_PURCHASEORDER p on d.PURCHASEORDERID=p.PURCHASEORDERID
+		<!--select t.DISRECID,-->
+		<!--b.INVOICEID invoicePrimaryKeyId,-->
+		<!--c.INVOICEID invoiceCode,-->
+		<!--c.INVOICECODE invoiceId,-->
+		<!--d.COMID_PS,-->
+		<!--b.FLAGLOG,-->
+		<!--TO_CHAR(p.submittime,'yyyy-mm-dd') submittime-->
+		<!--FROM TRADE_DISREC t-->
+		<!--INNER JOIN TEMP_RESULT b  on b.DISRECID = t.DISRECID-->
+		<!--INNER JOIN TRADE_INVOICENEW c on c.ID = b.INVOICEID-->
+		<!--INNER  JOIN TRADE_PURCHASEORDERDETAIL d on d.PURCHASEORDERDETAILID=t.PURCHASEORDERDETAILID-->
+		<!--INNER JOIN TRADE_PURCHASEORDER p on d.PURCHASEORDERID=p.PURCHASEORDERID-->
+		<!--<where>-->
+			<!--t.flag = 0-->
+			<!--<if test="@com.OGNL@isNotEmpty(startTime) and @com.OGNL@isNotEmpty(endTime)">-->
+				<!--AND p.submittime &gt;=TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss')-->
+				<!--AND p.submittime &lt;=TO_DATE (#{endTime},'yyyy-mm-dd hh24:mi:ss')-->
+			<!--</if>-->
+			<!--<if test="@com.OGNL@isNotEmpty(companyIdPs)">-->
+				<!--AND d.comid_ps = #{companyIdPs}-->
+			<!--</if>-->
+		<!--</where>-->
+		<!--ORDER BY p.submittime asc-->
+
+		SELECT * FROM V_DISINVOICE_CHECKRESULT t
 		<where>
-			t.flag = 0
-			<if test="@com.OGNL@isNotEmpty(startTime) and @com.OGNL@isNotEmpty(endTime)">
-				AND p.submittime &gt;=TO_DATE(#{startTime},'yyyy-mm-dd hh24:mi:ss')
-				AND p.submittime &lt;=TO_DATE (#{endTime},'yyyy-mm-dd hh24:mi:ss')
-			</if>
-			<if test="@com.OGNL@isNotEmpty(companyIdPs)">
-				AND d.comid_ps = #{companyIdPs}
-			</if>
+		<if test="@com.OGNL@isNotEmpty(companyIdPs)">
+		AND t.comid_ps = #{companyIdPs}
+		</if>
 		</where>
-		ORDER BY p.submittime asc
+		ORDER BY t.submittime asc
 	</select>
 
 	<insert id="insertDistributeInvoice" parameterType="map">
