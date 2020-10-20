@@ -16,4 +16,6 @@ public interface BaseImgannexDao extends GenericDao<BaseImgannex, String> {
      * @return
      */
     int addInvoiceImageProvince(Map<String, Object> map);
+
+    String getFolderId(Map<String, Object> folder);
 }

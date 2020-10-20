@@ -21,4 +21,9 @@ public class BaseImgannexManagerImpl extends GenericManagerImpl<BaseImgannex, St
     public int addInvoiceImageProvince(Map<String, Object> map) {
         return imgannexDao.addInvoiceImageProvince(map);
     }
+
+    @Override
+    public String getFolderId(Map<String, Object> folder){
+        return imgannexDao.getFolderId(folder);
+    }
 }

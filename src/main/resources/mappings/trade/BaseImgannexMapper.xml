@@ -305,4 +305,17 @@
 			from dual
 		</foreach> aa  on  aa.org_id=t.orgid
 	</insert>
+
+	<select id="getFolderId" parameterType="map" resultType="string">
+		SELECT t.FOLDERID FROM BASE_FOLDER t
+		<where>
+			<if test="@com.OGNL@isNotEmpty(orgId)">
+				AND t.ORGID = #{orgId}
+			</if>
+			<if test="@com.OGNL@isNotEmpty(folderName)">
+				AND t.FOLDERNAME = #{folderName}
+			</if>
+		</where>
+	</select>
+
 </mapper>

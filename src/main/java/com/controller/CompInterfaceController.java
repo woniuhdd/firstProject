@@ -533,6 +533,19 @@ public class CompInterfaceController {
             resultMap.put("errorMsg", tokenMap.get("resultMsg"));
             errorList.add(resultMap);
         }
+        //获取文件夹
+        Map<String, Object> folder = new HashMap<>();
+        folder.put("orgId",tokenMap.get("orgId").toString());
+        folder.put("folderName","发票图片(接口)");
+        String imgFolderId = baseImgannexManager.getFolderId(folder);
+        folder.put("folderName","随货单图片(接口)");
+        String imgFolderId2 = baseImgannexManager.getFolderId(folder);
+
+        if (StringUtils.isEmpty(imgFolderId) || StringUtils.isEmpty(imgFolderId2)){
+            resultMap.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
+            resultMap.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+"【图片文件夹不存在】");
+            errorList.add(resultMap);
+        }
 
         // 判断是否所有验证都已通过
         if (errorList.size() != 0){
@@ -590,6 +603,7 @@ public class CompInterfaceController {
             resultJsonObj.put("errorList", errorList);
             return resultJsonObj;
         }
+
         try {
             List<Map<String, Object>> checkList = new ArrayList<>();
             for (ComInterfaceImage item : invoiceImgLst) {
@@ -607,9 +621,9 @@ public class CompInterfaceController {
                 imgs.put("fileName", jsonImg.get("fileName".toString()));
                 imgs.put("imgOriginalUrl", jsonImg.get("returnurl").toString().replaceAll("\\\\", "/"));
                 imgs.put("imgThumbUrl", jsonImg.get("returnthumburl").toString().replaceAll("\\\\", "/"));
-                //随货单图片(接口)   77B4A1B9DB4301D0E053C0A8757101D0
-                //发票图片(接口)      77B4A1B9DB4201D0E053C0A8757101D0
-                imgs.put("folderId", item.getImageType().equals("0") ? "77B4A1B9DB4201D0E053C0A8757101D0" : "77B4A1B9DB4301D0E053C0A8757101D0");
+                //随货单图片(接口)   imgFolderId2
+                //发票图片(接口)      imgFolderId
+                imgs.put("folderId", item.getImageType().equals("0") ? imgFolderId : imgFolderId2);
                 imgs.put("orgId", tokenMap.get("orgId").toString());
                 checkList.add(imgs);
                 //设置返回对应关系
