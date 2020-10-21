@@ -1,14 +1,13 @@
 package com.controller;
 
 import com.alibaba.fastjson.JSONObject;
+import com.enums.Result;
+import com.enums.ResultCode;
 import com.sys.model.SysUser;
 import com.sys.service.SysUserManager;
 import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.ResponseBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping(TestController.ACTION_PATH)
@@ -37,6 +36,16 @@ public class TestController {
     public SysUser test() {
         SysUser sysUser = sysUserManager.getUserByUsername("ZBZX");
         return sysUser;
+    }
+
+    /**
+     * 异常邮件发送测试
+     * @return
+     */
+    @GetMapping("/testExceptionSendEmail")
+    public Result testExceptionSendEmail() {
+        int i = 1/0;
+        return new Result(ResultCode.SYSTEM_INNER_ERROR);
     }
 
 }
