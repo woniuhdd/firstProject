@@ -34,8 +34,6 @@ public class ComTokenController {
     @RequestMapping("/getToken")
     @ResponseBody
     public JSONObject adminLogin(HttpServletResponse response, String username, String password) {
-        // 这里模拟测试, 默认登录成功，返回用户ID和角色信息
-        String userId = UUID.randomUUID().toString();
         JSONObject returnJsonObj = new JSONObject();
         //验证用户名密码
         Map<String, Object> map = validateUser.validateUser(username,password);
