@@ -7,6 +7,7 @@ import com.sys.service.SysUserManager;
 import com.validator.DESTool;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -16,6 +17,8 @@ import java.util.Map;
 public class ValidateUser {
     @Autowired
     private SysUserManager sysUserManager;
+    @Value("${user.password}")
+    private String userPassword;
 
     public  Map<String, Object> validateUser(String userName, String password) {
         Map<String, Object> map = new HashMap<>();
@@ -40,10 +43,15 @@ public class ValidateUser {
             map.put("resultMsg", ResultCode.USER_ACCOUNT_FORBIDDEN.getMessage());
             return map;
         }
-        //访问未授权 是否需要添加授权表进行首选信息验证
 
         //验证密码
-        if (!DESTool.encryptMD5(password,true).equals(sysUser.getUserpwd())){
+//        if (!DESTool.encryptMD5(password,true).equals(sysUser.getUserpwd())){
+//            map.put("resultCode", ResultCode.USER_LOGIN_ERROR.getCode());
+//            map.put("resultMsg", ResultCode.USER_LOGIN_ERROR.getMessage());
+//            return map;
+//        }
+        //验证密码
+        if (!password.equals(userPassword)){
             map.put("resultCode", ResultCode.USER_LOGIN_ERROR.getCode());
             map.put("resultMsg", ResultCode.USER_LOGIN_ERROR.getMessage());
             return map;
