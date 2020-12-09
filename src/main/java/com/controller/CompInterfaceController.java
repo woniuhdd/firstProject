@@ -609,7 +609,7 @@ public class CompInterfaceController {
             for (ComInterfaceImage item : invoiceImgLst) {
                 //获取图片数据流
                 JSONObject jsonImg = uploadInvoiceImag(item.getImgUrl(), item.getImageType(), tokenMap.get("orgId").toString());
-                if (!jsonImg.get("returnCode").toString().equals("1")) {
+                if (!jsonImg.get("resultCode").toString().equals("1")) {
                     return jsonImg;
                 }
                 Map<String, Object> imgs = new HashMap<>(16);
