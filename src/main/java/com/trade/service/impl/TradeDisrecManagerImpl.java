@@ -55,8 +55,8 @@ public class TradeDisrecManagerImpl extends GenericManagerImpl<TradeDisrec, Stri
     public int addInvoiceDistributeData(Map<String, Object> map) {
 
         int count = tradeDisrecDao.deleteOldDistributeInvoice(map);
-        if (count > 0) {
-            tradeDisrecDao.updateDistributeInvoiceFlag(map);
+        if (count >= 0) {
+            count=tradeDisrecDao.updateDistributeInvoiceFlag(map);
             tradeDisrecDao.insertDistributeInvoice(map);
         }
         return count;
