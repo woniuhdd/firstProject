@@ -20,8 +20,9 @@ public class ToolUtils {
         //防止0开头，直接取2-4位
         //用随机数，防止并发
         String uuid = UUID.randomUUID().toString();
-        Long rand = Long.valueOf(("1" + uuid.replace("-", "").substring(13, 28)), 16);// 13, 28
-        return df.format(new Date()).toString() + rand.toString().substring(5, 13) + formWhere;
+//        Long rand = Long.valueOf(("1" + uuid.replace("-", "").substring(13, 28)), 16);// 13, 28
+//        return df.format(new Date()) + rand.toString().substring(5, 13) + formWhere;
+        return uuid;
     }
 
     /**

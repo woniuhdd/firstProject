@@ -607,20 +607,23 @@ public class CompInterfaceController {
         try {
             List<Map<String, Object>> checkList = new ArrayList<>();
             for (ComInterfaceImage item : invoiceImgLst) {
-                //获取图片数据流
-                JSONObject jsonImg = uploadInvoiceImag(item.getImgUrl(), item.getImageType(), tokenMap.get("orgId").toString());
-                if (!jsonImg.get("resultCode").toString().equals("1")) {
-                    return jsonImg;
-                }
+//                //获取图片数据流
+//                JSONObject jsonImg = uploadInvoiceImag(item.getImgUrl(), item.getImageType(), tokenMap.get("orgId").toString());
+//                if (!jsonImg.get("resultCode").toString().equals("1")) {
+//                    return jsonImg;
+//                }
                 Map<String, Object> imgs = new HashMap<>(16);
                 imgs.put("companyPrimaryKey", item.getCompanyPrimaryKey());
                 imgs.put("ID", ToolUtils.getPrimaryId("2"));
                 imgs.put("imgPrimaryID", item.getImgPrimaryID());
                 imgs.put("invoicePrimaryID", item.getInvoicePrimaryID());
                 imgs.put("imageType", item.getImageType().equals("0") ? "9" : "10");
-                imgs.put("fileName", jsonImg.get("fileName".toString()));
-                imgs.put("imgOriginalUrl", jsonImg.get("returnurl").toString().replaceAll("\\\\", "/"));
-                imgs.put("imgThumbUrl", jsonImg.get("returnthumburl").toString().replaceAll("\\\\", "/"));
+//                imgs.put("fileName", jsonImg.get("fileName".toString()));
+//                imgs.put("imgOriginalUrl", jsonImg.get("returnurl").toString().replaceAll("\\\\", "/"));
+//                imgs.put("imgThumbUrl", jsonImg.get("returnthumburl").toString().replaceAll("\\\\", "/"));
+                imgs.put("fileName", "发票图片(接口)");
+                imgs.put("imgOriginalUrl", item.getImgUrl());
+                imgs.put("imgThumbUrl", item.getImgUrl());
                 //随货单图片(接口)   imgFolderId2
                 //发票图片(接口)      imgFolderId
                 imgs.put("folderId", item.getImageType().equals("0") ? imgFolderId : imgFolderId2);
