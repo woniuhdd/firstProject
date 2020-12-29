@@ -37,6 +37,8 @@ public class CompInterfaceController {
     @Autowired
     private ValidateToken validateToken;
     @Autowired
+    private ValidateDistributeInfo validateDistributeInfo;
+    @Autowired
     private TradePurchaseorderdetailManager tradePurchaseorderdetailManager;
     @Autowired
     private SysDatainterfaceOrganizationManager sysDatainterfaceOrganizationManager;
@@ -221,7 +223,7 @@ public class CompInterfaceController {
 
 
         //验证distributeInfo
-        ValidateResult validateResult = ValidateDistributeInfo.validateDistributeInfo(distributeInfo);
+        ValidateResult validateResult = validateDistributeInfo.validateDistributeInfo(distributeInfo);
         if (!validateResult.isSuccess()) {
             return validateResult.getJsonObject();
         }

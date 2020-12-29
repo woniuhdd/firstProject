@@ -8,16 +8,23 @@ import com.enums.ResultCode;
 import com.model.DisBatch;
 import com.model.DistributeInfo;
 import com.model.ValidateResult;
+import com.trade.service.TradePurchaseorderdetailManager;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Component
 public class ValidateDistributeInfo {
 
-    public static ValidateResult validateDistributeInfo(String distributeInfo) {
+    @Autowired
+    private TradePurchaseorderdetailManager tradePurchaseorderdetailManager;
+
+    public ValidateResult validateDistributeInfo(String distributeInfo) {
         ValidateResult validateResult = new ValidateResult();
         validateResult.setSuccess(true);
 
@@ -66,6 +73,12 @@ public class ValidateDistributeInfo {
                     map.put("errorCode", ResultCode.PARAM_IS_BLANK.getCode());
                     map.put("errorMsg", ResultCode.PARAM_IS_BLANK.getMessage()+ "【订单明细编号不能为空】");
                     errorListTemp.add(map);
+                }else {
+                    if (tradePurchaseorderdetailManager.getById(distributeInfoTemp.getOrderDetailId()) == null){
+                        map.put("errorCode", ResultCode.RESULT_DATA_NONE.getCode());
+                        map.put("errorMsg", ResultCode.RESULT_DATA_NONE.getMessage()+ "【订单明细不存在】");
+                        errorListTemp.add(map);
+                    }
                 }
 
                 //配送日期disTime
