@@ -1179,7 +1179,7 @@ public class CompInterfaceController {
             //省平台直接交换，
             int num = tradeDisrecManager.addInvoiceDistributeData(map);
             if (num > 0) {
-                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getMessage());
+                resultJsonObj.put("resultCode", ResultCode.SUCCESS.getCode());
                 resultJsonObj.put("resultMsg", ResultCode.SUCCESS.getMessage());
                 resultJsonObj.put("successList", successList);
             } else {
