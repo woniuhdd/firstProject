@@ -1487,7 +1487,7 @@
 		WHERE L.CHANGETYPE='BASE_COMPANY'
 		GROUP BY L.DATAID) C ON T.ID=C.DATAID
 		<where>
-			t.COMPANYTYPE IN ('0','1','2')
+			(t.COMPANYTYPE IN ('0','1','2')
 			<if test="@com.OGNL@isNotEmpty(companyid)">
 				AND t.COMPANYID in(
 				<foreach collection="companyid" item="item" index="index"
@@ -1501,6 +1501,8 @@
 			<if test="@com.OGNL@isNotEmpty(endTime)">
 				AND c.LASTUPDATETIME &lt;= TO_DATE(#{endTime}, 'yyyy-mm-dd hh24:mi:ss')
 			</if>
+			)
+			or t.id = '6445BCE4A7DD41B8AB7BF9E6135D64B1'
 		</where>
 		ORDER BY C.LASTUPDATETIME  ASC, T.COMPANYID
 	</select>
